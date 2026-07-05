@@ -1,0 +1,1 @@
+export default import('../dist/esportsbuzz/server/server.mjs').then(m => m.reqHandler ?? m.default ?? m.app);
