@@ -1,1 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .bg-primary {
+    @apply bg-[#7C3AED];
+  }
+  .text-primary {
+    @apply text-[#7C3AED];
+  }
+  .text-gold {
+    @apply text-[#F59E0B];
+  }
+}
+
+@theme {
+  --color-primary: #7C3AED;
+  --color-gold: #F59E0B;
+  --color-danger: #EF4444;
+  --color-dark: #0a0a0f;
+  --color-surface: #1A1A2E;
+
+  --font-sans: "Inter", sans-serif;
+  --font-rajdhani: "Rajdhani", sans-serif;
+}
