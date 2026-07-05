@@ -1,0 +1,61 @@
+.animate-blob {
+  animation: blob 8s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(24px, -18px) scale(1.05);
+  }
+  66% {
+    transform: translate(-24px, 20px) scale(0.92);
+  }
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid rgba(124, 58, 237, 0.55);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .animate-blob {
+    display: none;
+  }
+}
+
+.animate-page-entrance {
+  animation: pageEntrance 0.9s ease-out both;
+}
+
+.animate-card-entrance {
+  animation: cardEntrance 0.8s ease-out both;
+}
+
+@keyframes pageEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
