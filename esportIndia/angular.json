@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "esaportsIndia": {
+    "esportsbuzz": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -64,10 +64,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "esaportsIndia:build:production"
+              "buildTarget": "esportsbuzz:build:production"
             },
             "development": {
-              "buildTarget": "esaportsIndia:build:development"
+              "buildTarget": "esportsbuzz:build:development"
             }
           },
           "defaultConfiguration": "development"

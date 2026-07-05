@@ -8,5 +8,5 @@ import { Login } from './login/login';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('esaportsIndia');
+  protected readonly title = signal('esportsbuzz');
 }
