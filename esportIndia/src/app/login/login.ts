@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { User, UserService } from '../services/user';
+import { environment } from '../../environment/environment';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +18,19 @@ export class Login {
 
   private http = inject(HttpClient);
   private router = inject(Router);
+  private authService = inject(AuthService);
+
+  private userService = inject(UserService);
+
+  users = signal<User[]>([]);
+
+  ngOnInit() {
+   
+    this.userService.getUsers().subscribe({
+      next: (data) => this.users.set(data),
+      error: (err) => console.error('Failed to fetch users:', err)
+    });
+  }
 
   // ── State signals ──────────────────────────────────────────────
   loading = signal(false);
@@ -64,20 +80,18 @@ export class Login {
       password: this.password.value,
     };
 
-    this.http.post<{ token: string }>('/api/auth/login', payload).subscribe({
-      next: (res) => {
-        localStorage.setItem('khelgg_token', res.token);
+    this.authService.login(payload.email, payload.password).subscribe({
+      next: () => {
         this.loading.set(false);
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/homepage']);
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMsg.set(
-          err.status === 401
-            ? 'Incorrect email or password.'
-            : 'Something went wrong. Try again.'
-        );
-      },
+        this.errorMsg.set('Login failed. Please check your credentials.');
+        console.error('Login error:', err);
+      }
     });
+
+
   }
 }
