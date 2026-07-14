@@ -33,7 +33,9 @@ export class AuthService {
     .pipe(
       tap((res) => {
         this.isLoggedIn.set(true);
-        this.router.navigate(['/homepage']);
+        if(res?.email!=="anonymousUser"){
+          this.router.navigate(['/homepage']);
+        }
       }),
       catchError(() => {
         this.isLoggedIn.set(false);
