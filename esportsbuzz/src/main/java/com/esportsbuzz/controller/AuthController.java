@@ -42,10 +42,10 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from("khelgg_token", token)
                 .httpOnly(true)
-                .secure(false)          // true in production (HTTPS only)
+                .secure(true)          // true in production (HTTPS only)
                 .path("/")
                 .maxAge(24 * 60 * 60)
-                .sameSite("Lax")        // "Lax" works for same-site; "None" needed if frontend/backend are different domains + secure(true)
+                .sameSite("None")        // "Lax" works for same-site; "None" needed if frontend/backend are different domains + secure(true)
                 .build();
 
 
