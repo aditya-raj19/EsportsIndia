@@ -16,7 +16,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
   templateUrl: './signup.html',
   styleUrl: './signup.css'
 })
-export class SignupComponent {
+export class Signup {
   loading = signal(false);
   errorMsg = signal<string | null>(null);
   showPassword = signal(false);
