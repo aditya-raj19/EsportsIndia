@@ -80,7 +80,7 @@ export class Login {
       password: this.password.value,
     };
 
-    this.authService.login(payload.email, payload.password).subscribe({
+    this.authService.signUp(payload.email, payload.password).subscribe({
       next: () => {
         this.loading.set(false);
         this.router.navigate(['/homepage']);
