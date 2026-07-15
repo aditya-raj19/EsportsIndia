@@ -7,13 +7,14 @@ import { routes } from './app.routes';
 import { authInterceptor } from './services/auth.interceptor';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from './services/auth.service';
+import { authRefreshInterceptor } from './services/auth.refreshinterceptor';
 
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor,authRefreshInterceptor])),
   provideAppInitializer(() => {
        const authService = inject(AuthService);
       return firstValueFrom(authService.checkAuth());

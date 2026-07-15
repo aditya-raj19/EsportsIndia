@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtil {
@@ -24,8 +25,12 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public String generateRefreshToken(){
+        return UUID.randomUUID().toString();
+    }
+
     // Called at LOGIN — creates a new token
-    public String generateToken(String email) {
+    public String generateAccessToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
