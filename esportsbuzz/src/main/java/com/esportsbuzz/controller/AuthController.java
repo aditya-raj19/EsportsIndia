@@ -56,21 +56,21 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> register(@RequestBody User signUprequest) {
 
         // Check if email already exists
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(signUprequest.getEmail()).isPresent()) {
             return ResponseEntity.status(409).body("Email already registered.");
         }
 
         User user = new User();
 
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // hash before saving
+        user.setEmail(signUprequest.getEmail());
+        user.setPassword(passwordEncoder.encode(signUprequest.getPassword())); // hash before saving
 
         userRepository.save(user); // this is the actual "save one user" step
 
-        return ResponseEntity.ok("User registered successfully.");
+        return ResponseEntity.ok().body(Map.of("message","User registered successfully."));
     }
 
     @PostMapping("/logout")
@@ -81,7 +81,7 @@ public class AuthController {
         cookie.setMaxAge(0); // deletes the cookie immediately
         response.addCookie(cookie);
 
-        return ResponseEntity.ok().body("Logged out");
+        return ResponseEntity.ok().body(Map.of("message", "Logged Out"));
     }
     @GetMapping("/me")
     public ResponseEntity<?> me() {

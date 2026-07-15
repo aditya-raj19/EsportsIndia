@@ -25,11 +25,6 @@ export class Login {
   users = signal<User[]>([]);
 
   ngOnInit() {
-   
-    this.userService.getUsers().subscribe({
-      next: (data) => this.users.set(data),
-      error: (err) => console.error('Failed to fetch users:', err)
-    });
   }
 
   // ── State signals ──────────────────────────────────────────────

@@ -2,6 +2,7 @@ import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -29,7 +30,7 @@ export class Signup {
 
   signupForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router,private authService: AuthService) {
     this.signupForm = this.fb.group(
       {
         username: ['', [Validators.required, Validators.minLength(3)]],
@@ -93,10 +94,19 @@ export class Signup {
     }
 
     this.loading.set(true);
-    // Replace with your actual auth service call
-    setTimeout(() => {
+    this.authService.signUp(this.signupForm.value).subscribe({
+    next: () => {
       this.loading.set(false);
-      this.router.navigate(['/dashboard']);
-    }, 1200);
+      this.router.navigate(['/homepage']);
+    },
+    error: (err) => {
+      this.loading.set(false);
+      if (err.status === 409) {
+        this.errorMsg.set('An account with this email already exists.');
+      } else {
+        this.errorMsg.set(err.error?.message ?? 'Something went wrong. Please try again.');
+      }
+    },
+  });
   }
 }

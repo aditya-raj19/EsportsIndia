@@ -20,8 +20,11 @@ export class AuthService {
     return this.http.post(`${environment.apiUrl}/logout`, {}, { withCredentials: true })
       .pipe(tap(() => this.isLoggedIn.set(false)));
   }
-  signUp(email: string, password: string) {
-    return this.http.post(`${environment.apiUrl}/register`, { email, password }, { withCredentials: true })
+  signUp(form: SignupPayload) {
+    const { email, password , username } = form;
+
+    return this.http
+      .post(`${environment.apiUrl}/register`, { email, password, username }, { withCredentials: true })
       .pipe(tap(() => this.isLoggedIn.set(true)));
   }
 
@@ -43,4 +46,12 @@ export class AuthService {
       })
     );
 }
+
+}
+export interface SignupPayload {
+  username?: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
+  terms?: boolean;
 }
