@@ -1,102 +1,151 @@
-<div class="min-h-screen bg-[#0a0a0f] flex items-center justify-center font-sans relative overflow-hidden animate-page-entrance px-6">
+<div class="min-h-screen bg-[#0a0a0f] text-white">
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-[#0a0a0f]/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <!-- Top Navigation -->
+            <div class="h-16 flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" (click)="navigateTo('/homepage')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br
+                   from-purple-500 to-fuchsia-600
+                   flex items-center justify-center">
+                        <span class="font-bold text-white">E</span>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg">
+                            EsportsBuzz
+                        </h1>
+                        <p class="text-xs text-white/40">
+                            Live • Upcoming • Results
+                        </p>
+                    </div>
+                </div>
+                <!-- Menu -->
+                <div class="hidden md:flex items-center gap-8">
+                    @for(menu of menus; track menu.route) {
+                    <button (click)="navigateTo(menu.route)" class="text-sm font-medium transition-colors"
+                        [class.text-purple-400]="isActive(menu.route)" [class.text-white]="isActive(menu.route)"
+                        [class.text-white/60]="!isActive(menu.route)">
+                        {{ menu.label }}
+                    </button>
+                    }
+                </div>
+                <!-- Right Side -->
+                <div class="flex items-center gap-3">
+                    <button class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition">
+                        🔔
+                    </button>
+                    <button (click)="onSignOut()" class="px-4 py-2 rounded-xl bg-red-500/20 border border-red-500/30
+                   text-red-400 hover:bg-red-500/30 transition">
+                        Logout
+                    </button>
+                </div>
 
-  <!-- Background grid -->
-  <div class="absolute inset-0 pointer-events-none"
-       style="background-image: linear-gradient(rgba(124,58,237,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.07) 1px, transparent 1px); background-size: 48px 48px;">
-  </div>
-
-  <!-- Glow blobs -->
-  <div class="absolute w-[500px] h-[500px] rounded-full pointer-events-none -top-32 -left-24"
-       style="background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);">
-  </div>
-  <div class="absolute w-[350px] h-[350px] rounded-full pointer-events-none -bottom-20 right-16"
-       style="background: radial-gradient(circle, rgba(245,158,11,0.10) 0%, transparent 70%);">
-  </div>
-
-  <!-- Card -->
-  <div class="w-full max-w-[400px] relative z-10 text-center animate-card-entrance">
-
-    <!-- Coming soon badge, sits above the card -->
-    <div class="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5 mb-5">
-      <span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
-      <span class="text-primary text-xs font-medium uppercase tracking-wider">Full site launching soon</span>
-    </div>
-
-    <div class="bg-white/[0.03] border border-purple-700/25 rounded-2xl p-9 shadow-[0_35px_100px_rgba(124,58,237,0.18)]">
-
-      <!-- Logo -->
-      <div class="flex items-center justify-center gap-2.5 mb-8">
-        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-          <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
-            <path d="M10 2L13 8H19L14 12L16 18L10 14L4 18L6 12L1 8H7L10 2Z" fill="white"/>
-          </svg>
-        </div>
-        <span class="font-rajdhani text-xl font-bold text-white tracking-wider">
-          Esports<span class="text-primary">Buzz</span>
-        </span>
-      </div>
-
-      @if (!signedOut()) {
-        <!-- Icon -->
-        <div class="w-14 h-14 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mx-auto mb-5">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-white/60">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-        </div>
-
-        <h2 class="text-xl font-medium text-white mb-1.5">Sign out of EsportsBuzz?</h2>
-        <p class="text-sm mb-8 leading-relaxed" style="color: rgba(255,255,255,0.45);">
-            You'll need to sign in again to access tournaments, rankings, and your dashboard.
-        </p>
-
-        @if (errorMsg()) {
-          <div class="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2.5 text-red-400 text-sm mb-4 text-left">
-            {{ errorMsg() }}
-          </div>
-        }
-
-        <div class="flex flex-col gap-2.5">
-          <button type="button"
-                  (click)="onSignOut()"
-                  [disabled]="loading()"
-                  class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-purple-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium text-sm py-3.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer">
-            @if (loading()) {
-              <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              Signing out...
-            } @else {
-              Sign out
+            </div>
+            <!-- Mobile navigation: horizontal scrolling keeps every section reachable on narrow screens. -->
+            <div class="md:hidden -mx-6 border-t border-white/10 px-6">
+                <div class="flex gap-1 overflow-x-auto py-2 scrollbar-none">
+                    @for(menu of menus; track menu.route) {
+                    <button (click)="navigateTo(menu.route)"
+                        class="shrink-0 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
+                        [class.bg-purple-500/15]="isActive(menu.route)" [class.text-purple-300]="isActive(menu.route)"
+                        [class.text-white/60]="!isActive(menu.route)">
+                        {{ menu.label }}
+                    </button>
+                    }
+                </div>
+            </div>
+            <!-- Games Navigation -->
+            @if(showMatchSection()) {
+            <div class="flex gap-3 overflow-x-auto py-4">
+                @for(game of games; track game.slug) {
+                <button (click)="navigateGame(game)" class="game-tab whitespace-nowrap px-4 py-2 rounded-full border transition-all " [class.game-tab-active]="isGameActive(game)" [class.bg-purple-500/15]="isGameActive(game)"
+                    [class.border-purple-500/40]="isGameActive(game)" [class.text-purple-400]="isGameActive(game)"
+                    [class.bg-white/5]="!isGameActive(game)" [class.border-white/10]="!isGameActive(game)"
+                    [class.text-white/60]="!isGameActive(game)">
+                    {{ game.name }}
+                </button>
+                }
+            </div>
             }
-          </button>
-
-          <button type="button"
-                  (click)="onCancel()"
-                  [disabled]="loading()"
-                  class="w-full flex items-center justify-center px-4 py-3 rounded-xl border border-white/10 bg-white/[0.05] text-white/70 text-sm font-medium hover:bg-white/[0.09] hover:border-white/20 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
-            Cancel
-          </button>
         </div>
-      } @else {
-        <!-- Signed out state -->
-        <div class="w-14 h-14 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center mx-auto mb-5">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-green-400">
-            <path d="M20 6 9 17l-5-5"/>
-          </svg>
+    </nav>
+    <!-- Hero Section -->
+    @if(isHomePage()) {
+    <section class="max-w-7xl mx-auto px-6 py-10">
+        <div class="relative overflow-hidden rounded-3xl
+             border border-purple-500/20
+             bg-gradient-to-r
+             from-purple-500/10
+             via-fuchsia-500/5
+             to-transparent
+             p-10">
+            <div class="max-w-2xl">
+                <span class="inline-flex items-center gap-2
+                 px-3 py-1 rounded-full
+                 bg-red-500/20 border border-red-500/30
+                 text-red-400 text-xs font-semibold">
+                    🔴 LIVE NOW
+                </span>
+                <h1 class="mt-4 text-5xl font-bold">
+                    Follow Every Match.
+                </h1>
+                <p class="mt-4 text-white/60 text-lg">
+                    Live scores, upcoming fixtures, tournament standings,
+                    match results and team rankings across all major esports.
+                </p>
+                <div class="flex gap-4 mt-6">
+                    <button (click)="navigateTo('/live')" class="px-6 py-3 rounded-xl
+                   bg-purple-600 hover:bg-purple-500
+                   font-semibold transition">
+                        Watch Live
+                    </button>
+                    <button (click)="navigateTo('/upcoming')" class="px-6 py-3 rounded-xl
+                   border border-white/20
+                   hover:bg-white/5 transition">
+                        Upcoming Matches
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <h2 class="text-xl font-medium text-white mb-1.5">You've been signed out</h2>
-        <p class="text-white/38 text-sm mb-8 leading-relaxed">
-          Thanks for playing. Come back anytime to keep climbing the leaderboard.
-        </p>
-
-        <a routerLink="/auth/login"
-           class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-purple-700 text-white font-medium text-sm py-3.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer">
-          Sign in again
-        </a>
-      }
-
-    </div>
-  </div>
-
+    </section>}
+    <!-- Featured Stats -->
+    @if(isHomePage()) {
+    <section class="max-w-7xl mx-auto px-6 pb-10">
+        <div class="grid md:grid-cols-4 gap-4">
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+                <p class="text-white/50 text-sm">Live Matches</p>
+                <h3 class="text-3xl font-bold mt-2">24</h3>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+                <p class="text-white/50 text-sm">Upcoming Today</p>
+                <h3 class="text-3xl font-bold mt-2">48</h3>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+                <p class="text-white/50 text-sm">Teams</p>
+                <h3 class="text-3xl font-bold mt-2">320</h3>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+                <p class="text-white/50 text-sm">Tournaments</p>
+                <h3 class="text-3xl font-bold mt-2">12</h3>
+            </div>
+        </div>
+    </section>}
+    @if (currentSection() === 'live') {
+    <app-live-matches [game]="selectedGame" [gameName]="selectedGameName()" />
+    } @else if (currentSection() === 'upcoming') {
+    @if (selectedGame === 'valorant') {
+    <app-valorant />
+    } @else {
+    <section class="max-w-5xl mx-auto px-6 py-12">
+        <div class="rounded-2xl border border-purple-500/20 bg-white/[0.03] p-10 text-center">
+            <p class="text-purple-400 text-sm font-semibold uppercase tracking-wider">{{ currentSection() }}</p>
+            <h2 class="mt-3 text-3xl font-bold">{{ selectedGameName() }} matches</h2>
+            <p class="mt-3 text-white/60">Match coverage for {{ selectedGameName() }} is coming soon.</p>
+        </div>
+    </section>
+    }
+    } @else if (isGameDataSection()) {
+    <app-game-section [section]="gameDataSection()" [gameName]="selectedGameName()" />
+    }
 </div>

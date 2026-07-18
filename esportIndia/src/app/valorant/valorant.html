@@ -1,0 +1,112 @@
+<div class="min-h-screen bg-[#0a0a0f] font-sans relative overflow-hidden px-6 py-12">
+
+  <!-- Background grid -->
+    <div class="absolute inset-0 pointer-events-none bg-grid"></div>
+
+
+  <!-- Glow blobs -->
+    <div class="absolute w-[500px] h-[500px] rounded-full pointer-events-none -top-32 -left-24 glow-purple"></div>
+  <div class="absolute w-[350px] h-[350px] rounded-full pointer-events-none -bottom-20 right-16 glow-gold"></div>
+
+
+  <div class="relative z-10 max-w-5xl mx-auto">
+
+    <!-- Header -->
+    <div class="mb-10">
+      <div class="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5 mb-4">
+        <span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+        <span class="text-primary text-xs font-medium uppercase tracking-wider">Valorant</span>
+      </div>
+      <h1 class="font-rajdhani text-4xl font-bold text-white">Upcoming Matches</h1>
+    </div>
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="flex justify-center py-20">
+        <span class="w-8 h-8 border-2 border-white/20 border-t-primary rounded-full animate-spin"></span>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (errorMsg()) {
+      <div class="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">
+        {{ errorMsg() }}
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (!loading() && !errorMsg() && matches().length === 0) {
+      <div class="text-center py-20" style="color: rgba(255,255,255,0.35);">
+        No upcoming matches right now. Check back soon.
+      </div>
+    }
+
+    <!-- Match list -->
+    @if (!loading() && matches().length > 0) {
+      <div class="grid gap-4">
+        @for (match of matches(); track match.matchId) {
+          <div class="match-card bg-white/[0.03] border border-purple-700/25 rounded-2xl p-6 hover:border-purple-500/40 transition-all duration-300" [style.animation-delay.ms]="$index * 80">
+
+            <!-- League / tournament context -->
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-primary text-[11px] uppercase tracking-widest font-medium">
+                  {{ match.leagueName }}
+                </span>
+                <span style="color: rgba(255,255,255,0.20);">•</span>
+                <span class="text-[11px]" style="color: rgba(255,255,255,0.40);">
+                  {{ match.serieName }}
+                </span>
+              </div>
+              <span class="text-[11px] font-medium" style="color: rgba(255,255,255,0.35);">
+                {{ match.beginAt | date:'MMM d, h:mm a' }}
+              </span>
+            </div>
+
+            <!-- Teams -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3 flex-1">
+                @if (match.teams[0]) {
+                  <img [src]="match.teams[0].imageUrl" [alt]="match.teams[0].name"
+                       class="w-10 h-10 object-contain" onerror="this.style.display='none'" />
+                  <span class="text-white font-medium text-sm">{{ match.teams[0].name }}</span>
+                }
+              </div>
+
+              <div class="px-4 text-center">
+                <app-match-countdown class="countdown-large" [targetTime]="match.beginAt" />
+                <span class="mt-2 block font-rajdhani text-xs font-bold tracking-widest" style="color: rgba(255,255,255,0.25);">VS</span>
+              </div>
+
+              <div class="flex items-center gap-3 flex-1 justify-end">
+                @if (match.teams[1]) {
+                  <span class="text-white font-medium text-sm">{{ match.teams[1].name }}</span>
+                  <img [src]="match.teams[1].imageUrl" [alt]="match.teams[1].name"
+                       class="w-10 h-10 object-contain" onerror="this.style.display='none'" />
+                }
+              </div>
+            </div>
+
+            <!-- Footer: format + stream link -->
+            <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.06]">
+              <span class="text-[11px]" style="color: rgba(255,255,255,0.30);">
+                Best of {{ match.numberOfGames }}
+              </span>
+              @if (match.streamUrl) {
+                <a [href]="match.streamUrl" target="_blank" rel="noopener noreferrer"
+                   class="text-primary text-xs font-medium hover:text-purple-400 transition-colors cursor-pointer flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                  Watch Stream
+                </a>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>
