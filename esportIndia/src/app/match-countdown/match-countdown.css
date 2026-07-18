@@ -1,0 +1,12 @@
+.countdown {
+  @apply rounded-full border border-purple-500/30 bg-purple-500/10 px-2.5 py-1 text-[11px] font-medium text-purple-300;
+  animation: countdownPulse 1s ease-in-out infinite;
+}
+
+:host(.countdown-large) .countdown {
+  @apply inline-block whitespace-nowrap rounded-xl px-4 py-2 font-rajdhani text-lg font-bold tracking-wide text-white;
+}
+
+@keyframes countdownPulse {
+  50% { border-color: rgba(192, 132, 252, 0.65); box-shadow: 0 0 16px rgba(168, 85, 247, 0.22); }
+}

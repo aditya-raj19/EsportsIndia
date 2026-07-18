@@ -1,0 +1,7 @@
+.match-card {
+  @apply rounded-2xl border border-purple-500/25 bg-white/[0.03] p-6;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.match-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(76, 29, 149, 0.18); }
+.state-card { @apply rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-12 text-center text-white/55; }
+.loader { @apply h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-purple-500; }

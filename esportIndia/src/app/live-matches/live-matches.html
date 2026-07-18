@@ -1,0 +1,33 @@
+<section class="min-h-[calc(100vh-8rem)] bg-[#0a0a0f] px-6 py-12">
+  <div class="max-w-5xl mx-auto">
+    <div class="mb-10">
+      <p class="text-red-400 text-xs font-semibold uppercase tracking-widest">● Live now</p>
+      <h1 class="mt-2 text-4xl font-bold text-white">Live {{ gameName() }} matches</h1>
+    </div>
+
+    @if (loading()) {
+      <div class="flex justify-center py-20"><span class="loader"></span></div>
+    } @else if (errorMsg()) {
+      <div class="state-card text-red-300">{{ errorMsg() }}</div>
+    } @else if (matches().length === 0) {
+      <div class="state-card">No live {{ gameName() }} matches right now.</div>
+    } @else {
+      <div class="grid gap-4">
+        @for (match of matches(); track match.matchId) {
+          <article class="match-card">
+            <div class="flex items-center justify-between gap-4 text-xs">
+              <span class="text-purple-400 uppercase tracking-wider">{{ match.leagueName }}</span>
+              <span class="text-red-400 font-semibold">LIVE</span>
+            </div>
+            <div class="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-white">
+              <span class="font-medium">{{ match.teams[0]?.name ?? 'TBD' }}</span>
+              <span class="text-white/35 font-bold">VS</span>
+              <span class="font-medium text-right">{{ match.teams[1]?.name ?? 'TBD' }}</span>
+            </div>
+            <div class="mt-5 border-t border-white/10 pt-4 text-xs text-white/45">{{ match.serieName }} · Best of {{ match.numberOfGames }}</div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>
