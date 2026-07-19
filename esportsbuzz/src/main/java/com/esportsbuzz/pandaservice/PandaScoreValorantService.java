@@ -115,18 +115,32 @@ public class PandaScoreValorantService {
                 dto.setVideogameName(matchNode.path("videogame").path("name").asText(""));
                 dto.setNumberOfGames(matchNode.path("number_of_games").asInt(0));
 
-                String mainStreamUrl = matchNode.path("live_url").asText("");
-                if (mainStreamUrl.isEmpty()) {
-                    mainStreamUrl = matchNode.path("official_stream_url").asText("");
+                String mainStreamUrl = matchNode.path("live_url").isNull() ? "" : matchNode.path("live_url").asText("");
+                if (mainStreamUrl.isEmpty() || "null".equalsIgnoreCase(mainStreamUrl)) {
+                    mainStreamUrl = matchNode.path("official_stream_url").isNull() ? "" : matchNode.path("official_stream_url").asText("");
+                }
+                if ("null".equalsIgnoreCase(mainStreamUrl)) {
+                    mainStreamUrl = "";
                 }
 
                 List<ValorantMatchDto.StreamDto> streams = new ArrayList<>();
                 for (JsonNode stream : matchNode.path("streams_list")) {
-                    String rawUrl = stream.path("raw_url").asText("");
-                    if (rawUrl.isEmpty()) {
-                        rawUrl = stream.path("embed_url").asText("");
+                    String rawUrl = stream.path("raw_url").isNull() ? "" : stream.path("raw_url").asText("");
+                    if (rawUrl.isEmpty() || "null".equalsIgnoreCase(rawUrl)) {
+                        rawUrl = stream.path("embed_url").isNull() ? "" : stream.path("embed_url").asText("");
                     }
-                    if (rawUrl.isEmpty()) continue;
+                    if (rawUrl.isEmpty() || "null".equalsIgnoreCase(rawUrl)) continue;
+
+                    // Convert Twitch player embed URL (player.twitch.tv/?channel=name) to raw twitch URL (twitch.tv/name)
+                    if (rawUrl.contains("player.twitch.tv") && rawUrl.contains("channel=")) {
+                        String channel = rawUrl.substring(rawUrl.indexOf("channel=") + 8);
+                        if (channel.contains("&")) {
+                            channel = channel.substring(0, channel.indexOf("&"));
+                        }
+                        if (!channel.isEmpty()) {
+                            rawUrl = "https://www.twitch.tv/" + channel;
+                        }
+                    }
 
                     ValorantMatchDto.StreamDto s = new ValorantMatchDto.StreamDto();
                     s.setRawUrl(rawUrl);

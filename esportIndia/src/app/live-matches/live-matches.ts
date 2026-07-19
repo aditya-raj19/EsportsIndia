@@ -1,4 +1,4 @@
-import { Component, input, inject, signal, OnInit, OnDestroy, OnChanges, PLATFORM_ID } from '@angular/core';
+import { Component, input, inject, signal, OnInit, OnDestroy, OnChanges, SimpleChanges, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { Subscription, timer } from 'rxjs';
@@ -27,8 +27,11 @@ export class LiveMatches implements OnInit, OnChanges, OnDestroy {
     this.startPolling();
   }
 
-  ngOnChanges(): void {
-    this.startPolling();
+  ngOnChanges(changes: SimpleChanges): void {
+    // Avoid double startPolling call on initial component mount
+    if (changes['game'] && !changes['game'].isFirstChange()) {
+      this.startPolling();
+    }
   }
 
   ngOnDestroy(): void {

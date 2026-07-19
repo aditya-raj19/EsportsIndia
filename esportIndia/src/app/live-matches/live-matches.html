@@ -13,7 +13,14 @@
         <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
         <span class="text-red-400 text-xs font-medium uppercase tracking-wider">Live now</span>
       </div>
-      <h1 class="font-rajdhani text-4xl font-bold text-white">Live {{ gameName() }} Matches</h1>
+      <h1 class="font-rajdhani text-4xl font-bold text-white flex items-center gap-3">
+        Live {{ gameName() }} Matches
+        @if (!loading() && matches().length > 0) {
+          <span class="text-xs font-bold px-3 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/30 tracking-wider">
+            {{ matches().length }}
+          </span>
+        }
+      </h1>
     </div>
 
     <!-- Loading -->

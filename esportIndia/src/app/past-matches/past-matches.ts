@@ -1,4 +1,4 @@
-import { Component, input, inject, signal, computed, OnInit, OnChanges } from '@angular/core';
+import { Component, input, inject, signal, computed, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { Dropdown } from '../dropdown/dropdown';
 
@@ -38,8 +38,11 @@ export class PastMatches implements OnInit, OnChanges {
     this.loadMatches();
   }
 
-  ngOnChanges(): void {
-    this.loadMatches();
+  ngOnChanges(changes: SimpleChanges): void {
+    // Avoid double API call on component mount (ngOnInit handles initial load)
+    if (changes['game'] && !changes['game'].isFirstChange()) {
+      this.loadMatches();
+    }
   }
 
   private loadMatches(): void {

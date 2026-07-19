@@ -41,11 +41,15 @@ export type GameSlug = 'valorant' | 'cs2' | 'lol' | 'dota2' | 'pubg';
 export class MatchService {
   private http = inject(HttpClient);
 
-  getUpcomingValorantMatches() {
+  getUpcomingMatches(game: GameSlug) {
     return this.http.get<UpcomingMatch[]>(
-      `${environment.apiUrl}/matches/valorant/upcoming`,
+      `${environment.apiUrl}/matches/${game}/upcoming`,
       { withCredentials: true }
     );
+  }
+
+  getUpcomingValorantMatches() {
+    return this.getUpcomingMatches('valorant');
   }
 
   getLiveMatches(game: GameSlug) {
