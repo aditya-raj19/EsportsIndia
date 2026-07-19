@@ -15,6 +15,8 @@ export const routes: Routes = [
   { path: 'upcoming/:game', component: Home, canActivate: [authGuard] },
   { path: 'results', component: Home, canActivate: [authGuard] },
   { path: 'results/:game', component: Home, canActivate: [authGuard] },
+  { path: 'tournaments', component: Home, canActivate: [authGuard] },
+  { path: 'tournaments/:game', component: Home, canActivate: [authGuard] },
   { path: 'teams', component: Home, canActivate: [authGuard] },
   { path: 'teams/:game', component: Home, canActivate: [authGuard] },
   { path: 'rankings', component: Home, canActivate: [authGuard] },

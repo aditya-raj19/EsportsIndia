@@ -296,6 +296,8 @@
     }
     } @else if (currentSection() === 'results') {
     <app-past-matches [game]="selectedGame" [gameName]="selectedGameName()" />
+    } @else if (currentSection() === 'tournaments') {
+    <app-tournaments [game]="selectedGame" [gameName]="selectedGameName()" />
     } @else if (isGameDataSection()) {
     <app-game-section [section]="gameDataSection()" [gameName]="selectedGameName()" />
     }

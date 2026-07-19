@@ -6,6 +6,7 @@ import { filter } from 'rxjs';
 import { Valorant } from '../valorant/valorant';
 import { LiveMatches } from '../live-matches/live-matches';
 import { PastMatches } from '../past-matches/past-matches';
+import { Tournaments } from '../tournaments/tournaments';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { GameSection, GameSectionType } from '../game-section/game-section';
 
@@ -16,7 +17,7 @@ interface Game {
 
 @Component({
   selector: 'app-home',
-  imports: [Valorant, LiveMatches, PastMatches, GameSection],
+  imports: [Valorant, LiveMatches, PastMatches, Tournaments, GameSection],
   standalone: true,
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -38,8 +39,9 @@ export class Home implements OnInit, OnDestroy {
   isLoadingSlider = signal<boolean>(true);
   private sliderTimer?: ReturnType<typeof setInterval>;
 
-  selectedGame = 'valorant';
+  selectedGame = 'all';
   readonly games: Game[] = [
+    { name: 'All', slug: 'all' },
     { name: 'Valorant', slug: 'valorant' },
     { name: 'CS2', slug: 'cs2' },
     { name: 'League of Legends', slug: 'lol' },
@@ -52,6 +54,7 @@ export class Home implements OnInit, OnDestroy {
     { label: 'Live', route: '/live' },
     { label: 'Upcoming', route: '/upcoming' },
     { label: 'Results', route: '/results' },
+    { label: 'Tournaments', route: '/tournaments' },
     { label: 'Teams', route: '/teams' },
     { label: 'Rankings', route: '/rankings' },
   ];
@@ -172,7 +175,7 @@ export class Home implements OnInit, OnDestroy {
   isHomePage(): boolean { return this.router.url === '/homepage'; }
 
   showMatchSection(): boolean {
-    return ['upcoming', 'live', 'results', 'teams', 'rankings']
+    return ['upcoming', 'live', 'results', 'tournaments', 'teams', 'rankings']
       .some((section) => this.router.url === `/${section}` || this.router.url.startsWith(`/${section}/`));
   }
 
@@ -200,7 +203,7 @@ export class Home implements OnInit, OnDestroy {
   }
 
   isGameDataSection(): boolean {
-    return ['results', 'teams', 'rankings'].includes(this.currentSection() ?? '');
+    return ['results', 'tournaments', 'teams', 'rankings'].includes(this.currentSection() ?? '');
   }
 
   gameDataSection(): GameSectionType {
@@ -209,10 +212,10 @@ export class Home implements OnInit, OnDestroy {
 
   private syncPageFromUrl(): void {
     const [, section, game] = this.router.url.split('?')[0].split('/');
-    if (['upcoming', 'live', 'results', 'teams', 'rankings'].includes(section) && this.games.some((item) => item.slug === game)) {
+    if (['upcoming', 'live', 'results', 'tournaments', 'teams', 'rankings'].includes(section) && this.games.some((item) => item.slug === game)) {
       this.selectedGame = game as GameSlug;
     } else if (section !== 'homepage') {
-      this.selectedGame = 'valorant';
+      this.selectedGame = 'all';
     }
   }
 }
