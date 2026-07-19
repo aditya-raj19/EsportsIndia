@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environment/environment';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, of, tap, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
@@ -25,7 +25,7 @@ export class AuthService {
 
     return this.http
       .post(`${environment.apiUrl}/register`, { email, password, username }, { withCredentials: true })
-      .pipe(tap(() => this.isLoggedIn.set(true)));
+      .pipe(switchMap(() => this.login(email, password)));
   }
 
 
