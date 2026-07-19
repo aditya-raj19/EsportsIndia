@@ -32,7 +32,7 @@ export class MatchCountdown implements OnInit, OnDestroy {
       return;
     }
     if (milliseconds <= 0) {
-      this.label.set('Starting now');
+      this.label.set('Started');
       return;
     }
 

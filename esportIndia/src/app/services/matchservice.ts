@@ -8,9 +8,17 @@ export interface Team {
   name: string;
   acronym: string;
   imageUrl: string;
+  score?: number;
 }
 
-export interface UpcomingMatch {
+export interface Stream {
+  rawUrl: string;
+  language: string;
+  isMain: boolean;
+  isOfficial: boolean;
+}
+
+export interface ValorantMatch {
   matchId: string;
   matchName: string;
   status: string;
@@ -21,8 +29,11 @@ export interface UpcomingMatch {
   videogameName: string;
   numberOfGames: number;
   streamUrl: string;
+  streams: Stream[];
   teams: Team[];
 }
+
+export interface UpcomingMatch extends ValorantMatch {}
 
 export type GameSlug = 'valorant' | 'cs2' | 'lol' | 'dota2' | 'pubg';
 
@@ -40,6 +51,13 @@ export class MatchService {
   getLiveMatches(game: GameSlug) {
     return this.http.get<UpcomingMatch[]>(
       `${environment.apiUrl}/matches/${game}/live`,
+      { withCredentials: true }
+    );
+  }
+
+  getPastMatches(game: GameSlug) {
+    return this.http.get<UpcomingMatch[]>(
+      `${environment.apiUrl}/matches/${game}/past`,
       { withCredentials: true }
     );
   }

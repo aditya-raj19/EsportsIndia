@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpcomingMatchDto {
+public class ValorantMatchDto {
     private String matchId;
     private String matchName;
     private String status;
@@ -19,8 +19,19 @@ public class UpcomingMatchDto {
     private String serieName;
     private String videogameName;
     private int numberOfGames;
-    private String streamUrl;
+    private String streamUrl; // keeping for backward compatibility
+    private List<StreamDto> streams;
     private List<TeamDto> teams;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StreamDto {
+        private String rawUrl;
+        private String language;
+        private boolean isMain;
+        private boolean isOfficial;
+    }
 
     @Data
     @NoArgsConstructor
@@ -30,5 +41,6 @@ public class UpcomingMatchDto {
         private String name;
         private String acronym;
         private String imageUrl;
+        private Integer score;
     }
 }
