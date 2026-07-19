@@ -1,6 +1,7 @@
 package com.esportsbuzz.pandaservice;
 
 import com.esportsbuzz.dto.ValorantMatchDto;
+import com.esportsbuzz.dto.TournamentDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -181,8 +182,8 @@ public class PandaScoreValorantService {
                     ValorantMatchDto.TeamDto team = new ValorantMatchDto.TeamDto();
                     team.setTeamId(teamId);
                     team.setName(teamNode.path("name").asText("TBD"));
-                    team.setAcronym(teamNode.path("acronym").asText(""));
-                    team.setImageUrl(teamNode.path("image_url").asText(""));
+                    team.setAcronym(teamNode.path("acronym").isNull() ? "" : teamNode.path("acronym").asText(""));
+                    team.setImageUrl(teamNode.path("image_url").isNull() ? "" : teamNode.path("image_url").asText(""));
                     
                     if (results != null && !results.isMissingNode() && results.isArray()) {
                         for (JsonNode res : results) {
@@ -269,5 +270,99 @@ public class PandaScoreValorantService {
             e.printStackTrace();
         }
         return matches;
+    }
+
+    public List<TournamentDto> getTournaments(String game, String status) {
+        // e.g. /valorant/tournaments/running or /tournaments/running for all
+        String url;
+        if ("all".equalsIgnoreCase(game)) {
+            url = baseUrl + "/tournaments/" + status;
+        } else {
+            String apiGame = game.toLowerCase();
+            if ("cs2".equals(apiGame)) {
+                apiGame = "csgo"; // PandaScore uses csgo slug instead of cs2
+            }
+            url = baseUrl + "/" + apiGame + "/tournaments/" + status;
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(apiKey);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, entity, String.class
+        );
+
+        return parseTournaments(response.getBody());
+    }
+
+    private List<TournamentDto> parseTournaments(String json) {
+        List<TournamentDto> tournaments = new ArrayList<>();
+        if (json == null || json.trim().isEmpty()) {
+            return tournaments;
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            if (root != null && root.isArray()) {
+                for (JsonNode node : root) {
+                    TournamentDto dto = new TournamentDto();
+                    dto.setId(node.path("id").asLong());
+                    dto.setName(node.path("name").asText("Unknown"));
+                    dto.setBeginAt(node.path("begin_at").asText(null));
+                    dto.setEndAt(node.path("end_at").asText(null));
+                    dto.setTier(node.path("tier").asText(null));
+                    dto.setPrizepool(node.path("prizepool").asText(null));
+                    
+                    JsonNode videogameNode = node.path("videogame");
+                    if (!videogameNode.isMissingNode() && !videogameNode.isNull()) {
+                        dto.setVideogameName(videogameNode.path("name").asText(null));
+                    }
+
+                    JsonNode leagueNode = node.path("league");
+                    if (!leagueNode.isMissingNode() && !leagueNode.isNull()) {
+                        dto.setLeagueId(leagueNode.path("id").asLong());
+                        dto.setLeagueName(leagueNode.path("name").asText("Unknown League"));
+                        dto.setLeagueImageUrl(leagueNode.path("image_url").isNull() ? null : leagueNode.path("image_url").asText(null));
+                    }
+
+                    List<TournamentDto.TeamDto> teams = new ArrayList<>();
+                    JsonNode teamsNode = node.path("teams");
+                    if (!teamsNode.isMissingNode() && teamsNode.isArray()) {
+                        for (JsonNode teamNode : teamsNode) {
+                            TournamentDto.TeamDto team = new TournamentDto.TeamDto();
+                            team.setTeamId(teamNode.path("id").asLong());
+                            team.setName(teamNode.path("name").asText("Unknown Team"));
+                            team.setAcronym(teamNode.path("acronym").isNull() ? null : teamNode.path("acronym").asText(null));
+                            team.setImageUrl(teamNode.path("image_url").isNull() ? null : teamNode.path("image_url").asText(null));
+                            teams.add(team);
+                        }
+                    }
+                    dto.setTeams(teams);
+
+                    List<TournamentDto.MatchDto> matches = new ArrayList<>();
+                    JsonNode matchesNode = node.path("matches");
+                    if (!matchesNode.isMissingNode() && matchesNode.isArray()) {
+                        for (JsonNode matchNode : matchesNode) {
+                            TournamentDto.MatchDto match = new TournamentDto.MatchDto();
+                            match.setId(matchNode.path("id").asLong());
+                            match.setName(matchNode.path("name").asText("Unknown Match"));
+                            match.setStatus(matchNode.path("status").asText(null));
+                            match.setBeginAt(matchNode.path("begin_at").asText(null));
+                            match.setEndAt(matchNode.path("end_at").asText(null));
+                            match.setScheduledAt(matchNode.path("scheduled_at").asText(null));
+                            match.setMatchType(matchNode.path("match_type").asText(null));
+                            match.setNumberOfGames(matchNode.path("number_of_games").asInt(0));
+                            matches.add(match);
+                        }
+                    }
+                    dto.setMatches(matches);
+                    tournaments.add(dto);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tournaments;
     }
 }

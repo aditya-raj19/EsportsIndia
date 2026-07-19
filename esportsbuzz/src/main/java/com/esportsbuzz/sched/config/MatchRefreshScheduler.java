@@ -3,6 +3,7 @@ package com.esportsbuzz.sched.config;
 import com.esportsbuzz.dto.ValorantMatchDto;
 import com.esportsbuzz.pandaservice.MatchCacheService;
 import com.esportsbuzz.pandaservice.PandaScoreValorantService;
+import com.esportsbuzz.pandaservice.TournamentCacheService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,18 @@ public class MatchRefreshScheduler {
     @Autowired
     private MatchCacheService matchCacheService;
 
+    @Autowired
+    private TournamentCacheService tournamentCacheService;
+
+    private static final String[] GAMES = {"valorant", "cs2", "lol", "dota2", "pubg", "all"};
+
     @PostConstruct
     public void initialFetch() {
         refreshUpcomingMatches();
         refreshLiveMatches();
         refreshPastMatches();
         refreshAllLiveMatches();
+        refreshTournaments();
     }
 
     @Scheduled(fixedRate = 1 * 60 * 60 * 1000) // every 1 hour
@@ -63,6 +70,19 @@ public class MatchRefreshScheduler {
             matchCacheService.setAllLiveMatches(matches);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Scheduled(fixedRate = 1 * 60 * 60 * 1000) // every 1 hour for tournaments
+    public void refreshTournaments() {
+        for (String game : GAMES) {
+            try {
+                tournamentCacheService.setTournaments(game, "running", pandaScoreValorantService.getTournaments(game, "running"));
+                tournamentCacheService.setTournaments(game, "upcoming", pandaScoreValorantService.getTournaments(game, "upcoming"));
+                Thread.sleep(250); // Small delay to prevent rate limit spikes
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

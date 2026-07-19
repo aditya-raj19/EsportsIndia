@@ -1,0 +1,150 @@
+<div class="tournaments-container">
+  
+  <div class="flex justify-between items-end mb-6">
+    <div>
+      <h2 class="text-2xl font-black italic uppercase tracking-wider text-white">
+        {{ gameName() }} Tournaments
+      </h2>
+      <p class="text-gray-400 text-sm mt-1">Explore ongoing and upcoming competitions.</p>
+    </div>
+    
+    <div class="flex bg-white/5 p-1 rounded-lg border border-white/10">
+      <button 
+        (click)="setTab('running')"
+        [class]="activeTab() === 'running' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'"
+        class="px-4 py-1.5 rounded-md text-sm font-semibold transition-all">
+        Running
+      </button>
+      <button 
+        (click)="setTab('upcoming')"
+        [class]="activeTab() === 'upcoming' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'"
+        class="px-4 py-1.5 rounded-md text-sm font-semibold transition-all">
+        Upcoming
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Row -->
+  <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-8">
+    <app-search 
+      [query]="searchQuery()" 
+      (queryChange)="searchQuery.set($event)"
+      placeholder="Search tournaments or leagues...">
+    </app-search>
+
+    <div class="flex bg-white/5 p-1 rounded-lg border border-white/10 w-full md:w-auto overflow-x-auto scrollbar-none">
+      <button (click)="selectedTier.set('All')" [class]="selectedTier() === 'All' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'" class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap">All Tiers</button>
+      <button (click)="selectedTier.set('S')" [class]="selectedTier() === 'S' ? 'bg-purple-500/20 text-purple-400' : 'text-gray-400 hover:text-white'" class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap">S-Tier</button>
+      <button (click)="selectedTier.set('A')" [class]="selectedTier() === 'A' ? 'bg-orange-500/20 text-orange-400' : 'text-gray-400 hover:text-white'" class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap">A-Tier</button>
+      <button (click)="selectedTier.set('B')" [class]="selectedTier() === 'B' ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white'" class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap">B-Tier</button>
+      <button (click)="selectedTier.set('C')" [class]="selectedTier() === 'C' ? 'bg-green-500/20 text-green-400' : 'text-gray-400 hover:text-white'" class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap">C-Tier</button>
+      <button (click)="selectedTier.set('D')" [class]="selectedTier() === 'D' ? 'bg-gray-500/20 text-gray-300' : 'text-gray-400 hover:text-white'" class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap">D-Tier</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="py-12 flex justify-center">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+
+  <div *ngIf="errorMsg()" class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+    {{ errorMsg() }}
+  </div>
+
+  <div *ngIf="!loading() && !errorMsg() && filteredTournaments().length === 0" class="py-12 text-center border border-white/5 rounded-xl bg-white/5">
+    <div class="text-gray-500 mb-2">
+      <svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    </div>
+    <h3 class="text-white font-medium">No tournaments found</h3>
+    <p *ngIf="searchQuery() || selectedTier() !== 'All'" class="text-gray-400 text-sm mt-1">No tournaments match your current search or tier filter.</p>
+    <p *ngIf="!searchQuery() && selectedTier() === 'All'" class="text-gray-400 text-sm mt-1">There are no {{ activeTab() }} tournaments for {{ gameName() }} right now.</p>
+  </div>
+
+  <div *ngIf="!loading() && filteredTournaments().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div *ngFor="let t of filteredTournaments(); let i = index" 
+         [style.animation-delay.ms]="i * 80"
+         style="animation: matchEnter 420ms ease-out both;"
+         class="group relative bg-white/[0.03] border border-purple-500/25 hover:border-purple-500/40 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-purple-900/20 hover:-translate-y-1">
+      
+      <!-- Top banner / League Info -->
+      <div class="p-4 border-b border-white/5 flex items-center justify-between gap-3 bg-gradient-to-r from-white/5 to-transparent relative">
+        <div class="flex items-center gap-3 overflow-hidden">
+          <div class="w-10 h-10 rounded-lg bg-white/95 p-1 flex items-center justify-center shadow-sm shrink-0">
+            <img *ngIf="t.leagueImageUrl" [src]="t.leagueImageUrl" [alt]="t.leagueName" class="max-w-full max-h-full object-contain">
+            <span *ngIf="!t.leagueImageUrl" class="text-gray-500 font-bold text-xs">{{ t.leagueName?.substring(0, 2) || 'LG' }}</span>
+          </div>
+          <div class="min-w-0">
+            <div class="text-xs text-gray-400 font-medium uppercase tracking-wide flex items-center gap-2 truncate">
+              <span *ngIf="t.videogameName" class="text-purple-400 font-bold shrink-0">{{ t.videogameName }}</span>
+              <span *ngIf="t.videogameName" class="text-gray-600 shrink-0">•</span>
+              <span class="truncate">{{ t.name }}</span>
+            </div>
+            <div class="text-white font-bold truncate" [title]="t.leagueName">{{ t.leagueName }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="p-5">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span *ngIf="t.tier" class="px-2 py-1 text-[10px] font-bold uppercase rounded border" [ngClass]="getTierColor(t.tier)">
+            {{ t.tier }}-Tier
+          </span>
+          <span *ngIf="t.region" class="px-2 py-1 text-[10px] font-bold uppercase bg-white/5 border border-white/10 text-gray-300 rounded flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            {{ t.region }}
+          </span>
+        </div>
+
+        <div class="space-y-3">
+          <!-- Prize Pool -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 2v8m0 0v2m0-2c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Prize Pool</div>
+              <div class="text-sm font-semibold text-white">{{ formatPrizePool(t.prizepool) }}</div>
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Dates</div>
+              <div class="text-sm font-semibold text-white">
+                {{ formatDate(t.beginAt) }} <span class="text-gray-500 mx-1">-</span> {{ formatDate(t.endAt) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teams Preview -->
+        <div *ngIf="t.teams && t.teams.length > 0" class="mt-5 pt-4 border-t border-white/5">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Participating Teams</span>
+            <span class="text-xs text-gray-400 font-medium">{{ t.teams.length }} Teams</span>
+          </div>
+          <div class="flex -space-x-2 overflow-hidden">
+            <div *ngFor="let team of t.teams | slice:0:6" class="inline-block h-8 w-8 rounded-full ring-2 ring-surface bg-white/95 flex items-center justify-center shadow-sm" [title]="team.name">
+              <img *ngIf="team.imageUrl" [src]="team.imageUrl" [alt]="team.name" class="h-5 w-5 object-contain">
+              <span *ngIf="!team.imageUrl" class="text-[10px] font-bold text-gray-400">{{ team.acronym || team.name?.substring(0,2) }}</span>
+            </div>
+            <div *ngIf="t.teams.length > 6" class="inline-block h-8 w-8 rounded-full ring-2 ring-surface bg-white/10 flex items-center justify-center">
+              <span class="text-xs font-medium text-white">+{{ t.teams.length - 6 }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

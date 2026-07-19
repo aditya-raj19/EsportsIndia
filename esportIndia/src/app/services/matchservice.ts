@@ -36,13 +36,19 @@ export interface ValorantMatch {
 
 export interface UpcomingMatch extends ValorantMatch {}
 
-export type GameSlug = 'valorant' | 'cs2' | 'lol' | 'dota2' | 'pubg';
+export type GameSlug = 'all' | 'valorant' | 'cs2' | 'lol' | 'dota2' | 'pubg';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
   private http = inject(HttpClient);
 
   getUpcomingMatches(game: GameSlug) {
+    if (game === 'all') {
+      return this.http.get<UpcomingMatch[]>(
+        `${environment.apiUrl}/matches/valorant/upcoming`,
+        { withCredentials: true }
+      );
+    }
     return this.http.get<UpcomingMatch[]>(
       `${environment.apiUrl}/matches/${game}/upcoming`,
       { withCredentials: true }
@@ -55,6 +61,9 @@ export class MatchService {
 
   private liveMatchesCache = new Map<GameSlug, Observable<UpcomingMatch[]>>();
   getLiveMatches(game: GameSlug) {
+    if (game === 'all') {
+      return this.getAllLiveMatches();
+    }
     if (!this.liveMatchesCache.has(game)) {
       const req$ = this.http.get<UpcomingMatch[]>(
         `${environment.apiUrl}/matches/${game}/live`,
@@ -68,6 +77,12 @@ export class MatchService {
   }
 
   getPastMatches(game: GameSlug) {
+    if (game === 'all') {
+      return this.http.get<UpcomingMatch[]>(
+        `${environment.apiUrl}/matches/valorant/past`,
+        { withCredentials: true }
+      );
+    }
     return this.http.get<UpcomingMatch[]>(
       `${environment.apiUrl}/matches/${game}/past`,
       { withCredentials: true }
