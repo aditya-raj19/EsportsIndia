@@ -216,4 +216,58 @@ public class PandaScoreValorantService {
         }
         return matches;
     }
+    /**
+     * Fetches ALL currently live matches across every game (Valorant, CS2, LoL, Dota2, etc.)
+     * from PandaScore's /lives endpoint. The response has a different structure:
+     * each item is { "match": {...}, "endpoints": [...] } instead of a flat match object.
+     */
+    public List<ValorantMatchDto> getAllLiveMatches() {
+        String url = baseUrl + "/lives";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(apiKey);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, entity, String.class
+        );
+
+        return parseLivesResponse(response.getBody());
+    }
+
+    /**
+     * Parses the /lives response which wraps each match inside a "match" key:
+     * [ { "match": { ...matchData... }, "endpoints": [...] }, ... ]
+     */
+    private List<ValorantMatchDto> parseLivesResponse(String json) {
+        List<ValorantMatchDto> matches = new ArrayList<>();
+        if (json == null || json.trim().isEmpty()) {
+            return matches;
+        }
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            if (root == null || !root.isArray()) {
+                return matches;
+            }
+
+            // Build a flat array of match nodes extracted from the wrapper
+            List<JsonNode> matchNodes = new ArrayList<>();
+            for (JsonNode liveItem : root) {
+                JsonNode matchNode = liveItem.path("match");
+                if (!matchNode.isMissingNode() && matchNode.isObject()) {
+                    matchNodes.add(matchNode);
+                }
+            }
+
+            // Reuse the existing parseMatches logic by converting back to JSON array
+            com.fasterxml.jackson.databind.node.ArrayNode arrayNode = objectMapper.createArrayNode();
+            for (JsonNode mn : matchNodes) {
+                arrayNode.add(mn);
+            }
+            return parseMatches(objectMapper.writeValueAsString(arrayNode));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return matches;
+    }
 }

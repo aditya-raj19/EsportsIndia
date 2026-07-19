@@ -65,4 +65,12 @@ export class MatchService {
       { withCredentials: true }
     );
   }
+
+  /** Fetches ALL currently live matches across every game via PandaScore /lives */
+  getAllLiveMatches() {
+    return this.http.get<UpcomingMatch[]>(
+      `${environment.apiUrl}/matches/valorant/all/live`,
+      { withCredentials: true }
+    );
+  }
 }

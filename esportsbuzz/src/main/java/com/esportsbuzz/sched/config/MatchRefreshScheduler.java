@@ -23,6 +23,7 @@ public class MatchRefreshScheduler {
         refreshUpcomingMatches();
         refreshLiveMatches();
         refreshPastMatches();
+        refreshAllLiveMatches();
     }
 
     @Scheduled(fixedRate = 1 * 60 * 60 * 1000) // every 1 hour
@@ -50,6 +51,16 @@ public class MatchRefreshScheduler {
         try {
             List<ValorantMatchDto> matches = pandaScoreValorantService.getPastMatches();
             matchCacheService.setPastMatches(matches);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Scheduled(fixedRate = 30 * 1000) // every 30 seconds for cross-game live matches
+    public void refreshAllLiveMatches() {
+        try {
+            List<ValorantMatchDto> matches = pandaScoreValorantService.getAllLiveMatches();
+            matchCacheService.setAllLiveMatches(matches);
         } catch (Exception e) {
             e.printStackTrace();
         }

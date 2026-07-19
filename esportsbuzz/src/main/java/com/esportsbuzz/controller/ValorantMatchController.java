@@ -32,4 +32,13 @@ public class ValorantMatchController {
     public ResponseEntity<List<ValorantMatchDto>> past() {
         return ResponseEntity.ok(matchCacheService.getPastMatches());
     }
+
+    /**
+     * Returns ALL currently live matches across every game (Valorant, CS2, LoL, Dota2, etc.)
+     * Powered by PandaScore's /lives endpoint.
+     */
+    @GetMapping("/all/live")
+    public ResponseEntity<List<ValorantMatchDto>> allLive() {
+        return ResponseEntity.ok(matchCacheService.getAllLiveMatches());
+    }
 }
