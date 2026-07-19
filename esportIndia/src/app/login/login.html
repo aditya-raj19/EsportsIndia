@@ -252,6 +252,20 @@
 
       </form>
 
+      <!-- Continue without login -->
+      <div class="mt-4">
+        <button type="button"
+                routerLink="/homepage"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/5 bg-transparent text-sm font-medium hover:bg-white/[0.03] hover:border-white/10 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.99] cursor-pointer"
+                style="color: rgba(255,255,255,0.60);">
+          Continue without login
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+
       <p class="text-center mt-5 text-xs" style="color: rgba(255,255,255,0.28);">
         New to EsportsBuzz?
         <a routerLink="/signup" class="text-gold font-medium hover:text-yellow-300 transition-colors cursor-pointer">
