@@ -7,8 +7,10 @@ import { Valorant } from '../valorant/valorant';
 import { LiveMatches } from '../live-matches/live-matches';
 import { PastMatches } from '../past-matches/past-matches';
 import { Tournaments } from '../tournaments/tournaments';
+import { Rankings } from '../rankings/rankings';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { GameSection, GameSectionType } from '../game-section/game-section';
+import { TournamentService } from '../services/tournament.service';
 
 interface Game {
   name: string;
@@ -17,13 +19,14 @@ interface Game {
 
 @Component({
   selector: 'app-home',
-  imports: [Valorant, LiveMatches, PastMatches, Tournaments, GameSection],
+  imports: [Valorant, LiveMatches, PastMatches, Tournaments, Rankings, GameSection],
   standalone: true,
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit, OnDestroy {
   private matchService = inject(MatchService);
+  private tournamentService = inject(TournamentService);
   private platformId = inject(PLATFORM_ID);
 
   loading = signal(false);
@@ -32,6 +35,7 @@ export class Home implements OnInit, OnDestroy {
 
   liveMatchesCount = signal<number>(0);
   upcomingMatchesCount = signal<number>(0);
+  tournamentsCount = signal<number>(0);
 
   sliderLiveMatches = signal<UpcomingMatch[]>([]);
   currentSlide = signal<number>(0);
@@ -147,6 +151,10 @@ export class Home implements OnInit, OnDestroy {
     this.matchService.getUpcomingMatches(slug).subscribe({
       next: (matches) => this.upcomingMatchesCount.set(matches.length),
       error: () => this.upcomingMatchesCount.set(0),
+    });
+    this.tournamentService.getRunningTournaments(slug).subscribe({
+      next: (tournaments) => this.tournamentsCount.set(tournaments.length),
+      error: () => this.tournamentsCount.set(0),
     });
   }
 

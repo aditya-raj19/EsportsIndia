@@ -24,4 +24,10 @@ public class TournamentCacheService {
         String key = game.toLowerCase() + "_" + status.toLowerCase();
         tournamentCache.put(key, tournaments);
     }
+    
+    private final Map<Long, List<com.esportsbuzz.dto.StandingDto>> standingsCache = new ConcurrentHashMap<>();
+    
+    public List<com.esportsbuzz.dto.StandingDto> getStandings(long tournamentId, java.util.function.Function<Long, List<com.esportsbuzz.dto.StandingDto>> fetcher) {
+        return standingsCache.computeIfAbsent(tournamentId, fetcher);
+    }
 }

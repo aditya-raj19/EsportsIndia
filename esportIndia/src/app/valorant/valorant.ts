@@ -20,8 +20,12 @@ export class Valorant implements OnInit {
   selectedTournament = signal<string | null>(null);
 
   tournaments = computed(() => {
-    const allSeries = this.matches().map((m) => m.serieName).filter((name) => !!name);
-    return Array.from(new Set(allSeries)).sort();
+    const allSeries = this.matches().map((m) => {
+      if (m.leagueName && m.serieName) return `${m.leagueName} - ${m.serieName}`;
+      if (m.leagueName) return m.leagueName;
+      return m.serieName;
+    }).filter((name) => !!name);
+    return Array.from(new Set(allSeries)).sort() as string[];
   });
 
   filteredMatches = computed(() => {
@@ -29,7 +33,10 @@ export class Valorant implements OnInit {
     if (!selected) {
       return this.matches();
     }
-    return this.matches().filter((m) => m.serieName === selected);
+    return this.matches().filter((m) => {
+      const matchName = (m.leagueName && m.serieName) ? `${m.leagueName} - ${m.serieName}` : (m.leagueName || m.serieName);
+      return matchName === selected;
+    });
   });
 
   ngOnInit() {

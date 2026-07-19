@@ -365,4 +365,53 @@ public class PandaScoreValorantService {
         }
         return tournaments;
     }
+
+    public List<com.esportsbuzz.dto.StandingDto> getTournamentStandings(long tournamentId) {
+        String url = baseUrl + "/tournaments/" + tournamentId + "/standings";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(apiKey);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, entity, String.class
+        );
+
+        return parseStandings(response.getBody());
+    }
+
+    private List<com.esportsbuzz.dto.StandingDto> parseStandings(String json) {
+        List<com.esportsbuzz.dto.StandingDto> standings = new ArrayList<>();
+        if (json == null || json.trim().isEmpty()) {
+            return standings;
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            if (root != null && root.isArray()) {
+                for (JsonNode node : root) {
+                    com.esportsbuzz.dto.StandingDto dto = new com.esportsbuzz.dto.StandingDto();
+                    dto.setRank(node.path("rank").asInt(0));
+                    
+                    JsonNode teamNode = node.path("team");
+                    if (!teamNode.isMissingNode() && !teamNode.isNull()) {
+                        dto.setTeamId(teamNode.path("id").asLong(0));
+                        dto.setTeamName(teamNode.path("name").asText("Unknown Team"));
+                        dto.setTeamAcronym(teamNode.path("acronym").isNull() ? null : teamNode.path("acronym").asText(null));
+                        dto.setTeamImageUrl(teamNode.path("image_url").isNull() ? null : teamNode.path("image_url").asText(null));
+                    }
+                    
+                    dto.setWins(node.path("wins").asInt(0));
+                    dto.setLosses(node.path("losses").asInt(0));
+                    dto.setTies(node.path("ties").asInt(0));
+                    dto.setPoints(node.path("points").asInt(0));
+                    
+                    standings.add(dto);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return standings;
+    }
 }

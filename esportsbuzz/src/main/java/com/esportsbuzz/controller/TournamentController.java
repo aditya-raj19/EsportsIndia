@@ -29,4 +29,14 @@ public class TournamentController {
         List<TournamentDto> tournaments = tournamentCacheService.getTournaments(game, "upcoming");
         return ResponseEntity.ok(tournaments);
     }
+    
+    @Autowired
+    private com.esportsbuzz.pandaservice.PandaScoreValorantService pandaScoreService;
+
+    @GetMapping("/{id}/standings")
+    public ResponseEntity<List<com.esportsbuzz.dto.StandingDto>> getTournamentStandings(@PathVariable long id) {
+        List<com.esportsbuzz.dto.StandingDto> standings = tournamentCacheService.getStandings(id, 
+            tournamentId -> pandaScoreService.getTournamentStandings(tournamentId));
+        return ResponseEntity.ok(standings);
+    }
 }

@@ -70,7 +70,7 @@
     <!-- Live Matches Hero Slider Section -->
     @if(isHomePage()) {
     <section class="max-w-7xl mx-auto px-6 py-8">
-      <div class="relative overflow-hidden rounded-3xl border border-purple-500/25 bg-gradient-to-br from-[#120924] via-[#0d0718] to-[#07040e] p-8 shadow-[0_20px_50px_rgba(124,58,237,0.15)]">
+      <div (mouseenter)="stopAutoSlide()" (mouseleave)="startAutoSlide()" class="relative overflow-hidden rounded-3xl border border-purple-500/25 bg-gradient-to-br from-[#120924] via-[#0d0718] to-[#07040e] p-8 shadow-[0_20px_50px_rgba(124,58,237,0.15)]">
         
         <!-- Background Ambient Glows -->
         <div class="absolute -right-20 -top-20 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -276,7 +276,7 @@
             </div>
             <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
                 <p class="text-white/50 text-sm">Tournaments</p>
-                <h3 class="text-3xl font-bold mt-2 text-white">12</h3>
+                <h3 class="text-3xl font-bold mt-2 text-white">{{ tournamentsCount() }}</h3>
             </div>
         </div>
     </section>}
@@ -298,6 +298,8 @@
     <app-past-matches [game]="selectedGame" [gameName]="selectedGameName()" />
     } @else if (currentSection() === 'tournaments') {
     <app-tournaments [game]="selectedGame" [gameName]="selectedGameName()" />
+    } @else if (currentSection() === 'rankings') {
+    <app-rankings [game]="selectedGame" [gameName]="selectedGameName()" />
     } @else if (isGameDataSection()) {
     <app-game-section [section]="gameDataSection()" [gameName]="selectedGameName()" />
     }

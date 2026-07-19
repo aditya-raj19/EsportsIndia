@@ -39,6 +39,18 @@ export interface Tournament {
   matches: TournamentMatch[];
 }
 
+export interface Standing {
+  rank: number;
+  teamId: number;
+  teamName: string;
+  teamAcronym: string;
+  teamImageUrl: string;
+  wins: number;
+  losses: number;
+  ties: number;
+  points: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TournamentService {
   private http = inject(HttpClient);
@@ -53,6 +65,13 @@ export class TournamentService {
   getUpcomingTournaments(game: GameSlug): Observable<Tournament[]> {
     return this.http.get<Tournament[]>(
       `${environment.apiUrl}/tournaments/${game}/upcoming`,
+      { withCredentials: true }
+    );
+  }
+
+  getTournamentStandings(tournamentId: number): Observable<Standing[]> {
+    return this.http.get<Standing[]>(
+      `${environment.apiUrl}/tournaments/${tournamentId}/standings`,
       { withCredentials: true }
     );
   }
