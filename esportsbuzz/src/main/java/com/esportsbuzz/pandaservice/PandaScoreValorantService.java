@@ -115,20 +115,44 @@ public class PandaScoreValorantService {
                 dto.setVideogameName(matchNode.path("videogame").path("name").asText(""));
                 dto.setNumberOfGames(matchNode.path("number_of_games").asInt(0));
 
-                String mainStreamUrl = "";
+                String mainStreamUrl = matchNode.path("live_url").asText("");
+                if (mainStreamUrl.isEmpty()) {
+                    mainStreamUrl = matchNode.path("official_stream_url").asText("");
+                }
+
                 List<ValorantMatchDto.StreamDto> streams = new ArrayList<>();
                 for (JsonNode stream : matchNode.path("streams_list")) {
+                    String rawUrl = stream.path("raw_url").asText("");
+                    if (rawUrl.isEmpty()) {
+                        rawUrl = stream.path("embed_url").asText("");
+                    }
+                    if (rawUrl.isEmpty()) continue;
+
                     ValorantMatchDto.StreamDto s = new ValorantMatchDto.StreamDto();
-                    s.setRawUrl(stream.path("raw_url").asText(""));
+                    s.setRawUrl(rawUrl);
                     s.setLanguage(stream.path("language").asText("en"));
                     s.setMain(stream.path("main").asBoolean(false));
                     s.setOfficial(stream.path("official").asBoolean(false));
                     streams.add(s);
 
-                    if (stream.path("main").asBoolean(false)) {
-                        mainStreamUrl = stream.path("raw_url").asText("");
+                    if (stream.path("main").asBoolean(false) && mainStreamUrl.isEmpty()) {
+                        mainStreamUrl = rawUrl;
                     }
                 }
+
+                if (mainStreamUrl.isEmpty() && !streams.isEmpty()) {
+                    mainStreamUrl = streams.get(0).getRawUrl();
+                }
+
+                if (!mainStreamUrl.isEmpty() && streams.isEmpty()) {
+                    ValorantMatchDto.StreamDto s = new ValorantMatchDto.StreamDto();
+                    s.setRawUrl(mainStreamUrl);
+                    s.setLanguage("en");
+                    s.setMain(true);
+                    s.setOfficial(true);
+                    streams.add(s);
+                }
+
                 dto.setStreams(streams);
                 dto.setStreamUrl(mainStreamUrl);
 
@@ -154,6 +178,20 @@ public class PandaScoreValorantService {
                             }
                         }
                     }
+
+                    // Fallback: If score is 0, count won games in games array
+                    if (team.getScore() == 0 && matchNode.has("games") && matchNode.path("games").isArray()) {
+                        int wonGames = 0;
+                        for (JsonNode gameNode : matchNode.path("games")) {
+                            if (gameNode.path("winner").path("id").asLong() == teamId) {
+                                wonGames++;
+                            }
+                        }
+                        if (wonGames > 0) {
+                            team.setScore(wonGames);
+                        }
+                    }
+
                     teams.add(team);
                 }
                 dto.setTeams(teams);

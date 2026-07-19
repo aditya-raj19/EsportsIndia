@@ -1,4 +1,5 @@
-import { Component, input, inject, signal, OnInit, OnDestroy, OnChanges } from '@angular/core';
+import { Component, input, inject, signal, OnInit, OnDestroy, OnChanges, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -15,6 +16,7 @@ export class LiveMatches implements OnInit, OnChanges, OnDestroy {
   readonly gameName = input.required<string>();
 
   private readonly matchService = inject(MatchService);
+  private readonly platformId = inject(PLATFORM_ID);
   readonly matches = signal<UpcomingMatch[]>([]);
   readonly loading = signal(false);
   readonly errorMsg = signal<string | null>(null);
@@ -43,7 +45,19 @@ export class LiveMatches implements OnInit, OnChanges, OnDestroy {
     }
     this.errorMsg.set(null);
 
-    // Poll backend every 30 seconds seamlessly
+    // Prevents SSR/Prerender timeout during build: do single fetch on server, don't run recurring timer!
+    if (!isPlatformBrowser(this.platformId)) {
+      this.matchService.getLiveMatches(this.game()).subscribe({
+        next: (matches) => {
+          this.matches.set(matches);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
+      return;
+    }
+
+    // Poll backend every 30 seconds seamlessly in browser
     this.pollSubscription = timer(0, 30000)
       .pipe(switchMap(() => this.matchService.getLiveMatches(this.game())))
       .subscribe({

@@ -172,7 +172,13 @@
           </div>
           @if (email.invalid && email.touched) {
             <span class="text-red-400 text-[11px] mt-1 block">
-              {{ email.hasError('required') ? 'Email is required.' : 'Enter a valid email.' }}
+              @if (email.hasError('required')) {
+                Email is required.
+              } @else if (email.hasError('invalidEmailProvider')) {
+                Please use a recognized email provider (e.g. Gmail, Yahoo, Outlook, iCloud, Proton).
+              } @else {
+                Enter a valid email address.
+              }
             </span>
           }
         </div>
