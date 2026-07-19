@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, shareReplay } from 'rxjs';
 import { environment } from '../../environment/environment';
 
 
@@ -52,11 +53,18 @@ export class MatchService {
     return this.getUpcomingMatches('valorant');
   }
 
+  private liveMatchesCache = new Map<GameSlug, Observable<UpcomingMatch[]>>();
   getLiveMatches(game: GameSlug) {
-    return this.http.get<UpcomingMatch[]>(
-      `${environment.apiUrl}/matches/${game}/live`,
-      { withCredentials: true }
-    );
+    if (!this.liveMatchesCache.has(game)) {
+      const req$ = this.http.get<UpcomingMatch[]>(
+        `${environment.apiUrl}/matches/${game}/live`,
+        { withCredentials: true }
+      ).pipe(shareReplay(1));
+      
+      this.liveMatchesCache.set(game, req$);
+      setTimeout(() => this.liveMatchesCache.delete(game), 15000);
+    }
+    return this.liveMatchesCache.get(game)!;
   }
 
   getPastMatches(game: GameSlug) {
@@ -66,11 +74,17 @@ export class MatchService {
     );
   }
 
+  private allLiveCache$?: Observable<UpcomingMatch[]>;
   /** Fetches ALL currently live matches across every game via PandaScore /lives */
   getAllLiveMatches() {
-    return this.http.get<UpcomingMatch[]>(
-      `${environment.apiUrl}/matches/valorant/all/live`,
-      { withCredentials: true }
-    );
+    if (!this.allLiveCache$) {
+      this.allLiveCache$ = this.http.get<UpcomingMatch[]>(
+        `${environment.apiUrl}/matches/valorant/all/live`,
+        { withCredentials: true }
+      ).pipe(shareReplay(1));
+      
+      setTimeout(() => this.allLiveCache$ = undefined, 15000);
+    }
+    return this.allLiveCache$;
   }
 }
