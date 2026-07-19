@@ -63,7 +63,7 @@ export class Home implements OnInit, OnDestroy {
     { label: 'Rankings', route: '/rankings' },
   ];
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(public auth: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.syncPageFromUrl();

@@ -50,6 +50,7 @@ export class PastMatches implements OnInit, OnChanges {
 
     this.loading.set(true);
     this.errorMsg.set(null);
+    this.matches.set([]); // Clear matches when changing games
     this.matchService.getPastMatches(this.game()).subscribe({
       next: (matches) => {
         this.matches.set(matches);

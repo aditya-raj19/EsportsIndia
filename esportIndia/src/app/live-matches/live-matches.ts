@@ -45,6 +45,9 @@ export class LiveMatches implements OnInit, OnChanges, OnDestroy {
     // Show loading spinner only on initial load when matches are empty
     if (this.matches().length === 0) {
       this.loading.set(true);
+    } else {
+      this.matches.set([]); // Clear matches when changing games
+      this.loading.set(true);
     }
     this.errorMsg.set(null);
 

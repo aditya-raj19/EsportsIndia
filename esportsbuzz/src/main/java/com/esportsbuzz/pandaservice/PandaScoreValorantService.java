@@ -94,6 +94,40 @@ public class PandaScoreValorantService {
         return parseMatches(response.getBody());
     }
 
+    /**
+     * Generic method to fetch matches for any game and status.
+     * @param game  Frontend slug: valorant, cs2, lol, dota2, pubg
+     * @param status  PandaScore match status: "upcoming", "running", or "past"
+     */
+    public List<ValorantMatchDto> getMatchesByGame(String game, String status) {
+        String apiGame = game.toLowerCase();
+        if ("cs2".equals(apiGame)) {
+            apiGame = "csgo"; // PandaScore uses csgo slug
+        }
+
+        String url;
+        if ("all".equalsIgnoreCase(game)) {
+            // Note: the /matches/running endpoint is used for 'all' games if status=running
+            url = baseUrl + "/matches/" + status + "?page[size]=20";
+        } else {
+            url = baseUrl + "/" + apiGame + "/matches/" + status + "?page[size]=20";
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(apiKey);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url, HttpMethod.GET, entity, String.class
+            );
+            return parseMatches(response.getBody());
+        } catch (Exception e) {
+            System.err.println("Error fetching " + status + " matches for " + game + ": " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
     private List<ValorantMatchDto> parseMatches(String json) {
         List<ValorantMatchDto> matches = new ArrayList<>();
         if (json == null || json.trim().isEmpty()) {
@@ -219,58 +253,28 @@ public class PandaScoreValorantService {
     }
     /**
      * Fetches ALL currently live matches across every game (Valorant, CS2, LoL, Dota2, etc.)
-     * from PandaScore's /lives endpoint. The response has a different structure:
-     * each item is { "match": {...}, "endpoints": [...] } instead of a flat match object.
+     * from PandaScore's /matches/running endpoint.
      */
     public List<ValorantMatchDto> getAllLiveMatches() {
-        String url = baseUrl + "/lives";
+        String url = baseUrl + "/matches/running?page[size]=20";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(apiKey);
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                url, HttpMethod.GET, entity, String.class
-        );
-
-        return parseLivesResponse(response.getBody());
-    }
-
-    /**
-     * Parses the /lives response which wraps each match inside a "match" key:
-     * [ { "match": { ...matchData... }, "endpoints": [...] }, ... ]
-     */
-    private List<ValorantMatchDto> parseLivesResponse(String json) {
-        List<ValorantMatchDto> matches = new ArrayList<>();
-        if (json == null || json.trim().isEmpty()) {
-            return matches;
-        }
         try {
-            JsonNode root = objectMapper.readTree(json);
-            if (root == null || !root.isArray()) {
-                return matches;
-            }
-
-            // Build a flat array of match nodes extracted from the wrapper
-            List<JsonNode> matchNodes = new ArrayList<>();
-            for (JsonNode liveItem : root) {
-                JsonNode matchNode = liveItem.path("match");
-                if (!matchNode.isMissingNode() && matchNode.isObject()) {
-                    matchNodes.add(matchNode);
-                }
-            }
-
-            // Reuse the existing parseMatches logic by converting back to JSON array
-            com.fasterxml.jackson.databind.node.ArrayNode arrayNode = objectMapper.createArrayNode();
-            for (JsonNode mn : matchNodes) {
-                arrayNode.add(mn);
-            }
-            return parseMatches(objectMapper.writeValueAsString(arrayNode));
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url, HttpMethod.GET, entity, String.class
+            );
+            return parseMatches(response.getBody());
         } catch (Exception e) {
+            System.err.println("Error fetching all live matches: " + e.getMessage());
             e.printStackTrace();
+            return new ArrayList<>();
         }
-        return matches;
     }
+
+
 
     public List<TournamentDto> getTournaments(String game, String status) {
         // e.g. /valorant/tournaments/running or /tournaments/running for all

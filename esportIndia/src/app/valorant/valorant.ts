@@ -1,6 +1,6 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, inject, signal, computed, input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { MatchService, UpcomingMatch } from '../services/matchservice';
+import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { MatchCountdown } from '../match-countdown/match-countdown';
 import { Dropdown } from '../dropdown/dropdown';
 
@@ -11,7 +11,10 @@ import { Dropdown } from '../dropdown/dropdown';
   templateUrl: './valorant.html',
   styleUrl: './valorant.css',
 })
-export class Valorant implements OnInit {
+export class Valorant implements OnInit, OnChanges {
+  readonly game = input<GameSlug>('valorant');
+  readonly gameName = input<string>('Valorant');
+
   private matchService = inject(MatchService);
 
   matches = signal<UpcomingMatch[]>([]);
@@ -40,7 +43,22 @@ export class Valorant implements OnInit {
   });
 
   ngOnInit() {
-    this.matchService.getUpcomingValorantMatches().subscribe({
+    this.fetchMatches();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['game'] && !changes['game'].isFirstChange()) {
+      this.fetchMatches();
+    }
+  }
+
+  private fetchMatches() {
+    this.loading.set(true);
+    this.errorMsg.set(null);
+    this.selectedTournament.set(null);
+    this.matches.set([]); // Clear matches when changing games!
+
+    this.matchService.getUpcomingMatches(this.game()).subscribe({
       next: (data) => {
         const now = Date.now();
         const futureMatches = data.filter(m => !m.beginAt || new Date(m.beginAt).getTime() > now);

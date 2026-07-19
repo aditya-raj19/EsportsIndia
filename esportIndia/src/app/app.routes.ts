@@ -1,24 +1,23 @@
 import { Routes } from '@angular/router';
 import { Home } from './home/home';
 import { Login } from './login/login';
-import { authGuard } from './services/auth.guard';
 import { Signup} from './signup/signup';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'login', pathMatch: 'full' },
+    { path: '', redirectTo: 'homepage', pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
-  { path: 'homepage', component: Home , canActivate: [authGuard]},
-  { path: 'live', component: Home, canActivate: [authGuard] },
-  { path: 'live/:game', component: Home, canActivate: [authGuard] },
-  { path: 'upcoming', component: Home, canActivate: [authGuard] },
-  { path: 'upcoming/:game', component: Home, canActivate: [authGuard] },
-  { path: 'results', component: Home, canActivate: [authGuard] },
-  { path: 'results/:game', component: Home, canActivate: [authGuard] },
-  { path: 'tournaments', component: Home, canActivate: [authGuard] },
-  { path: 'tournaments/:game', component: Home, canActivate: [authGuard] },
-  { path: 'teams', component: Home, canActivate: [authGuard] },
-  { path: 'teams/:game', component: Home, canActivate: [authGuard] },
-  { path: 'rankings', component: Home, canActivate: [authGuard] },
-  { path: 'rankings/:game', component: Home, canActivate: [authGuard] },
+  { path: 'homepage', component: Home },
+  { path: 'live', component: Home },
+  { path: 'live/:game', component: Home },
+  { path: 'upcoming', component: Home },
+  { path: 'upcoming/:game', component: Home },
+  { path: 'results', component: Home },
+  { path: 'results/:game', component: Home },
+  { path: 'tournaments', component: Home },
+  { path: 'tournaments/:game', component: Home },
+  { path: 'teams', component: Home },
+  { path: 'teams/:game', component: Home },
+  { path: 'rankings', component: Home },
+  { path: 'rankings/:game', component: Home },
 ];

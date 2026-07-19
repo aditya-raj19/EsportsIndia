@@ -35,9 +35,10 @@ export class AuthService {
     .get<{ email: string }>(`${environment.apiUrl}/me`, { withCredentials: true })
     .pipe(
       tap((res) => {
-        this.isLoggedIn.set(true);
-        if(res?.email!=="anonymousUser"){
-          this.router.navigate(['/homepage']);
+        if(res?.email && res.email !== "anonymousUser"){
+          this.isLoggedIn.set(true);
+        } else {
+          this.isLoggedIn.set(false);
         }
       }),
       catchError(() => {
