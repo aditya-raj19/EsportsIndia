@@ -1,4 +1,4 @@
-import { Component, input, inject, signal, computed } from '@angular/core';
+import { Component, input, inject, signal, computed, OnInit, OnChanges } from '@angular/core';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { Dropdown } from '../dropdown/dropdown';
 
@@ -9,7 +9,7 @@ import { Dropdown } from '../dropdown/dropdown';
   templateUrl: './past-matches.html',
   styleUrl: './past-matches.css',
 })
-export class PastMatches {
+export class PastMatches implements OnInit, OnChanges {
   readonly game = input.required<GameSlug>();
   readonly gameName = input.required<string>();
 
@@ -33,6 +33,10 @@ export class PastMatches {
     }
     return this.matches().filter((m) => m.serieName === selected);
   });
+
+  ngOnInit(): void {
+    this.loadMatches();
+  }
 
   ngOnChanges(): void {
     this.loadMatches();

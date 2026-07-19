@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -102,10 +103,27 @@ public class AuthController {
                 .body(Map.of("message", "Access token refreshed"));
     }
 
+    private static final List<String> ALLOWED_DOMAINS = List.of(
+            "gmail.com", "googlemail.com",
+            "yahoo.com", "yahoo.in", "yahoo.co.in", "yahoo.co.uk",
+            "outlook.com", "hotmail.com", "live.com", "msn.com",
+            "icloud.com", "me.com", "mac.com",
+            "protonmail.com", "proton.me",
+            "zoho.com", "rediffmail.com", "aol.com", "gmx.com", "yandex.com"
+    );
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User signUprequest) {
+        String email = signUprequest.getEmail();
+        if (email != null && email.contains("@")) {
+            String domain = email.substring(email.indexOf("@") + 1).toLowerCase().trim();
+            if (!ALLOWED_DOMAINS.contains(domain)) {
+                return ResponseEntity.status(400).body(Map.of("message", "Please use a recognized email provider (e.g. Gmail, Yahoo, Outlook, iCloud, Proton)."));
+            }
+        }
+
         if (userRepository.findByEmail(signUprequest.getEmail()).isPresent()) {
-            return ResponseEntity.status(409).body("Email already registered.");
+            return ResponseEntity.status(409).body(Map.of("message", "Email already registered."));
         }
 
         User user = new User();

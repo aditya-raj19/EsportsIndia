@@ -4,6 +4,28 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
+const ALLOWED_DOMAINS = [
+  'gmail.com', 'googlemail.com',
+  'yahoo.com', 'yahoo.in', 'yahoo.co.in', 'yahoo.co.uk',
+  'outlook.com', 'hotmail.com', 'live.com', 'msn.com',
+  'icloud.com', 'me.com', 'mac.com',
+  'protonmail.com', 'proton.me',
+  'zoho.com', 'rediffmail.com', 'aol.com', 'gmx.com', 'yandex.com'
+];
+
+function allowedEmailValidator(control: AbstractControl): ValidationErrors | null {
+  const value = control.value;
+  if (!value || typeof value !== 'string') return null;
+
+  const domain = value.split('@')[1]?.toLowerCase().trim();
+  if (!domain) return null;
+
+  if (!ALLOWED_DOMAINS.includes(domain)) {
+    return { invalidEmailProvider: true };
+  }
+  return null;
+}
+
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
   const confirmPassword = control.get('confirmPassword')?.value;
@@ -34,7 +56,7 @@ export class Signup {
     this.signupForm = this.fb.group(
       {
         username: ['', [Validators.required, Validators.minLength(3)]],
-        email: ['', [Validators.required, Validators.email]],
+        email: ['', [Validators.required, Validators.email, allowedEmailValidator]],
         password: ['', [Validators.required, Validators.minLength(8)]],
         confirmPassword: ['', Validators.required],
         terms: [false, Validators.requiredTrue],
