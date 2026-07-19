@@ -76,7 +76,38 @@
         <div class="absolute -right-20 -top-20 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        @if (sliderLiveMatches().length > 0) {
+        @if (isLoadingSlider()) {
+          <!-- Skeleton Loader for Hero Slider -->
+          <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 min-h-[260px] animate-pulse">
+            <!-- Left Info Column Skeleton -->
+            <div class="flex-1 space-y-5">
+              <div class="flex gap-3">
+                <div class="w-24 h-7 bg-white/10 rounded-full"></div>
+                <div class="w-20 h-7 bg-white/10 rounded-full"></div>
+              </div>
+              <div class="w-3/4 h-9 bg-white/10 rounded-lg"></div>
+              <div class="w-1/2 h-5 bg-white/10 rounded-lg"></div>
+              <div class="flex gap-3 pt-4">
+                <div class="w-36 h-11 bg-white/10 rounded-xl"></div>
+                <div class="w-36 h-11 bg-white/10 rounded-xl"></div>
+              </div>
+            </div>
+            <!-- Right Live Scoreboard Card Skeleton -->
+            <div class="w-full md:w-[420px] bg-white/[0.02] border border-white/5 rounded-2xl p-6">
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex-1 flex flex-col items-center gap-2">
+                  <div class="w-16 h-16 bg-white/10 rounded-2xl"></div>
+                  <div class="w-16 h-4 bg-white/10 rounded"></div>
+                </div>
+                <div class="w-24 h-12 bg-white/10 rounded-xl"></div>
+                <div class="flex-1 flex flex-col items-center gap-2">
+                  <div class="w-16 h-16 bg-white/10 rounded-2xl"></div>
+                  <div class="w-16 h-4 bg-white/10 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @else if (sliderLiveMatches().length > 0) {
           @let currentMatch = sliderLiveMatches()[currentSlide()];
           
           <div [class.slide-fade-in]="isAnimating()" class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 min-h-[260px]">
@@ -94,7 +125,10 @@
               </div>
 
               <h2 class="font-rajdhani text-2xl md:text-3xl font-bold text-white tracking-wide">
-                {{ currentMatch.serieName || currentMatch.leagueName || 'Official Tournament' }}
+                {{ currentMatch.leagueName || 'Official Tournament' }}
+                @if (currentMatch.tournamentName) {
+                  <span class="text-white/50"> — </span>{{ currentMatch.tournamentName }}
+                }
               </h2>
 
               <p class="text-white/50 text-sm">
@@ -204,7 +238,7 @@
           </div>
         } @else {
           <!-- Fallback Hero Header when no matches are live -->
-          <div class="relative z-10 max-w-2xl py-4">
+          <div class="relative z-10 max-w-2xl py-4 slide-fade-in">
             <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-4">
               Esports Arena
             </span>

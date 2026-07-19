@@ -25,7 +25,7 @@ public class SecurityConfig {
         http.csrf(csrf->csrf.disable())
                 .cors(cors-> cors.configurationSource(corsConfigurationSource()))
                 .logout(logout -> logout.disable())
-                .authorizeHttpRequests(auth->auth.requestMatchers("/login", "/register", "/logout", "/refresh").permitAll()
+                .authorizeHttpRequests(auth->auth.requestMatchers("/login", "/register", "/logout", "/refresh", "/health").permitAll()
                         .anyRequest().authenticated()
                 ).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -33,7 +33,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration config=new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://esportsbuzz.vercel.app"));
+        config.setAllowedOrigins(List.of("https://esportsbuzz.vercel.app","https://esportsbuzz.in","https://www.esportsbuzz.in"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

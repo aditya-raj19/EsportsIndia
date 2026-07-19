@@ -45,4 +45,15 @@ public class MatchCacheService {
     public void setPastMatches(List<ValorantMatchDto> matches) {
         this.pastMatches = matches;
     }
+
+    // Cross-game live matches from /lives endpoint
+    private volatile List<ValorantMatchDto> allLiveMatches = Collections.emptyList();
+
+    public List<ValorantMatchDto> getAllLiveMatches() {
+        return allLiveMatches;
+    }
+
+    public void setAllLiveMatches(List<ValorantMatchDto> matches) {
+        this.allLiveMatches = matches;
+    }
 }

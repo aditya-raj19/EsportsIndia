@@ -2,7 +2,7 @@ import { Component, signal, inject, OnInit, OnDestroy, PLATFORM_ID } from '@angu
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter, forkJoin } from 'rxjs';
+import { filter } from 'rxjs';
 import { Valorant } from '../valorant/valorant';
 import { LiveMatches } from '../live-matches/live-matches';
 import { PastMatches } from '../past-matches/past-matches';
@@ -35,6 +35,7 @@ export class Home implements OnInit, OnDestroy {
   sliderLiveMatches = signal<UpcomingMatch[]>([]);
   currentSlide = signal<number>(0);
   isAnimating = signal<boolean>(false);
+  isLoadingSlider = signal<boolean>(true);
   private sliderTimer?: ReturnType<typeof setInterval>;
 
   selectedGame = 'valorant';
@@ -71,21 +72,18 @@ export class Home implements OnInit, OnDestroy {
   }
 
   private loadSliderMatches() {
-    forkJoin([
-      this.matchService.getLiveMatches('valorant'),
-      this.matchService.getLiveMatches('cs2'),
-      this.matchService.getLiveMatches('lol'),
-      this.matchService.getLiveMatches('dota2')
-    ]).subscribe({
-      next: ([val, cs, lol, dota]) => {
-        const allLive = [...val, ...cs, ...lol, ...dota];
+    this.isLoadingSlider.set(true);
+    this.matchService.getAllLiveMatches().subscribe({
+      next: (allLive) => {
         this.sliderLiveMatches.set(allLive);
         if (allLive.length > 1 && isPlatformBrowser(this.platformId)) {
           this.startAutoSlide();
         }
+        this.triggerSlideAnim();
+        this.isLoadingSlider.set(false);
       },
       error: () => {
-        this.matchService.getLiveMatches('valorant').subscribe((m) => this.sliderLiveMatches.set(m));
+        this.isLoadingSlider.set(false);
       },
     });
   }
@@ -139,7 +137,7 @@ export class Home implements OnInit, OnDestroy {
 
   private loadStats() {
     const slug = this.selectedGame as GameSlug;
-    this.matchService.getLiveMatches(slug).subscribe({
+    this.matchService.getAllLiveMatches().subscribe({
       next: (matches) => this.liveMatchesCount.set(matches.length),
       error: () => this.liveMatchesCount.set(0),
     });
