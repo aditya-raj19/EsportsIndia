@@ -11,13 +11,26 @@
 
   <div class="relative z-10 max-w-5xl mx-auto">
 
-    <!-- Header -->
-    <div class="mb-10">
-      <div class="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5 mb-4">
-        <span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
-        <span class="text-primary text-xs font-medium uppercase tracking-wider">Valorant</span>
+    <!-- Header & Filter -->
+    <div class="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5 mb-4">
+          <span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+          <span class="text-primary text-xs font-medium uppercase tracking-wider">Valorant</span>
+        </div>
+        <h1 class="font-rajdhani text-4xl font-bold text-white">Upcoming Matches</h1>
       </div>
-      <h1 class="font-rajdhani text-4xl font-bold text-white">Upcoming Matches</h1>
+
+      @if (!loading() && tournaments().length > 0) {
+        <div class="relative min-w-[200px] sm:min-w-[260px]">
+          <app-dropdown 
+            [items]="tournaments()" 
+            [selectedItem]="selectedTournament()" 
+            placeholder="All Tournaments"
+            (selectionChange)="selectedTournament.set($event)">
+          </app-dropdown>
+        </div>
+      }
     </div>
 
     <!-- Loading -->
@@ -35,72 +48,113 @@
     }
 
     <!-- Empty state -->
-    @if (!loading() && !errorMsg() && matches().length === 0) {
+    @if (!loading() && !errorMsg() && filteredMatches().length === 0) {
       <div class="text-center py-20" style="color: rgba(255,255,255,0.35);">
-        No upcoming matches right now. Check back soon.
+        No upcoming matches found.
       </div>
     }
 
     <!-- Match list -->
-    @if (!loading() && matches().length > 0) {
+    @if (!loading() && filteredMatches().length > 0) {
       <div class="grid gap-4">
-        @for (match of matches(); track match.matchId) {
+        @for (match of filteredMatches(); track match.matchId) {
           <div class="match-card bg-white/[0.03] border border-purple-700/25 rounded-2xl p-6 hover:border-purple-500/40 transition-all duration-300" [style.animation-delay.ms]="$index * 80">
 
             <!-- League / tournament context -->
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <span class="text-primary text-[11px] uppercase tracking-widest font-medium">
-                  {{ match.leagueName }}
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div class="flex flex-wrap items-center gap-2 min-w-0">
+                <span class="text-primary text-[11px] uppercase tracking-widest font-bold">
+                  {{ match.leagueName ?? 'Unknown League' }}
                 </span>
-                <span style="color: rgba(255,255,255,0.20);">•</span>
-                <span class="text-[11px]" style="color: rgba(255,255,255,0.40);">
-                  {{ match.serieName }}
-                </span>
+                @if (match.serieName) {
+                  <span class="text-white/30">•</span>
+                  <span class="text-xs sm:text-sm font-medium text-white/80">
+                    {{ match.serieName }}
+                  </span>
+                }
               </div>
-              <span class="text-[11px] font-medium" style="color: rgba(255,255,255,0.35);">
-                {{ match.beginAt | date:'MMM d, h:mm a' }}
-              </span>
+              @if (match.beginAt) {
+                <span class="text-[11px] font-medium shrink-0" style="color: rgba(255,255,255,0.40);">
+                  {{ match.beginAt | date:'MMM d, h:mm a' }}
+                </span>
+              }
             </div>
 
             <!-- Teams -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3 flex-1">
-                @if (match.teams[0]) {
-                  <img [src]="match.teams[0].imageUrl" [alt]="match.teams[0].name"
-                       class="w-10 h-10 object-contain" onerror="this.style.display='none'" />
-                  <span class="text-white font-medium text-sm">{{ match.teams[0].name }}</span>
+            <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
+              <div class="flex items-center gap-1.5 sm:gap-3 min-w-0">
+                @if (match.teams?.[0]; as team0) {
+                  @if (team0.imageUrl) {
+                    <img [src]="team0.imageUrl" [alt]="team0.name ?? 'Team'"
+                         class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                  }
+                  <span class="text-white font-medium text-xs sm:text-sm break-words min-w-0">{{ team0.name ?? 'TBD' }}</span>
+                } @else {
+                  <span class="text-white/50 font-medium text-xs sm:text-sm">TBD</span>
                 }
               </div>
 
-              <div class="px-4 text-center">
-                <app-match-countdown class="countdown-large" [targetTime]="match.beginAt" />
-                <span class="mt-2 block font-rajdhani text-xs font-bold tracking-widest" style="color: rgba(255,255,255,0.25);">VS</span>
+              <div class="px-2 sm:px-4 text-center shrink-0">
+                @if (match.beginAt) {
+                  <app-match-countdown class="countdown-large" [targetTime]="match.beginAt" />
+                }
+                <span class="mt-1 sm:mt-2 block font-rajdhani text-xs sm:text-sm font-extrabold tracking-widest" style="color: rgba(255,255,255,0.30);">VS</span>
               </div>
 
-              <div class="flex items-center gap-3 flex-1 justify-end">
-                @if (match.teams[1]) {
-                  <span class="text-white font-medium text-sm">{{ match.teams[1].name }}</span>
-                  <img [src]="match.teams[1].imageUrl" [alt]="match.teams[1].name"
-                       class="w-10 h-10 object-contain" onerror="this.style.display='none'" />
+              <div class="flex items-center gap-1.5 sm:gap-3 justify-end min-w-0">
+                @if (match.teams?.[1]; as team1) {
+                  <span class="text-white font-medium text-xs sm:text-sm break-words text-right min-w-0">{{ team1.name ?? 'TBD' }}</span>
+                  @if (team1.imageUrl) {
+                    <img [src]="team1.imageUrl" [alt]="team1.name ?? 'Team'"
+                         class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                  }
+                } @else {
+                  <span class="text-white/50 font-medium text-xs sm:text-sm">TBD</span>
                 }
               </div>
             </div>
 
             <!-- Footer: format + stream link -->
-            <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.06]">
+            <div class="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-white/[0.06] gap-2">
               <span class="text-[11px]" style="color: rgba(255,255,255,0.30);">
-                Best of {{ match.numberOfGames }}
+                Best of {{ match.numberOfGames ?? '—' }}
               </span>
-              @if (match.streamUrl) {
-                <a [href]="match.streamUrl" target="_blank" rel="noopener noreferrer"
-                   class="text-primary text-xs font-medium hover:text-purple-400 transition-colors cursor-pointer flex items-center gap-1.5">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                  Watch Stream
-                </a>
-              }
+              
+              <div class="flex flex-wrap items-center gap-2">
+                @if (match.streams && match.streams.length > 0) {
+                  @for (stream of match.streams; track stream.rawUrl) {
+                    <a [href]="stream.rawUrl" target="_blank" rel="noopener noreferrer"
+                       [class]="getStreamPlatform(stream.rawUrl) === 'YouTube' 
+                         ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
+                         : getStreamPlatform(stream.rawUrl) === 'Twitch' 
+                         ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
+                         : 'text-xs font-medium px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1.5'">
+                      @if (getStreamPlatform(stream.rawUrl) === 'Twitch') {
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M2.149 0L.537 4.119v16.836h5.731V24h3.224l3.045-3.045h4.657l6.269-6.269V0H2.149zm19.164 13.612l-4.298 4.298h-4.657l-3.045 3.045v-3.045H4.836V2.149h16.478v11.463zm-3.582-7.343v5.731h-2.149V6.269h2.149zm-5.731 0v5.731H9.851V6.269h2.149z"/>
+                        </svg>
+                      } @else if (getStreamPlatform(stream.rawUrl) === 'YouTube') {
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.501 5.814a3.016 3.016 0 0 0 2.122 2.136c1.872.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                      } @else {
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      }
+                      Watch {{ getStreamPlatform(stream.rawUrl) }}
+                    </a>
+                  }
+                } @else if (match.streamUrl) {
+                  <a [href]="match.streamUrl" target="_blank" rel="noopener noreferrer"
+                     class="text-xs font-medium px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1.5">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    Watch Stream
+                  </a>
+                }
+              </div>
             </div>
 
           </div>

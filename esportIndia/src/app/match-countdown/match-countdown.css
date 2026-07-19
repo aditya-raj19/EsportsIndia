@@ -4,7 +4,19 @@
 }
 
 :host(.countdown-large) .countdown {
-  @apply inline-block whitespace-nowrap rounded-xl px-4 py-2 font-rajdhani text-lg font-bold tracking-wide text-white;
+  @apply inline-block whitespace-nowrap rounded-lg px-2.5 py-1 font-rajdhani text-xs font-bold tracking-wide text-white;
+}
+
+@media (min-width: 640px) {
+  :host(.countdown-large) .countdown {
+    @apply rounded-xl px-4 py-2 text-base;
+  }
+}
+
+@media (min-width: 768px) {
+  :host(.countdown-large) .countdown {
+    @apply text-lg;
+  }
 }
 
 @keyframes countdownPulse {

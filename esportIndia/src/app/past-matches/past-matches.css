@@ -1,0 +1,16 @@
+.state-card { @apply rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-12 text-center text-white/55; }
+.loader { @apply h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-purple-500; }
+/* Custom scrollbar for dropdown */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.3);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.6);
+}

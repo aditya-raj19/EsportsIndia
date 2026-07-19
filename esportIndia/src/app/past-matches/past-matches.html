@@ -7,13 +7,26 @@
   <div class="absolute w-[350px] h-[350px] rounded-full pointer-events-none -bottom-20 right-16 glow-gold"></div>
 
   <div class="relative z-10 max-w-5xl mx-auto">
-    <!-- Header -->
-    <div class="mb-10">
-      <div class="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-full px-4 py-1.5 mb-4">
-        <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
-        <span class="text-red-400 text-xs font-medium uppercase tracking-wider">Live now</span>
+    <!-- Header & Filter -->
+    <div class="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 mb-4">
+          <span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+          <span class="text-purple-400 text-xs font-medium uppercase tracking-wider">Results</span>
+        </div>
+        <h1 class="font-rajdhani text-4xl font-bold text-white">Past {{ gameName() }} Matches</h1>
       </div>
-      <h1 class="font-rajdhani text-4xl font-bold text-white">Live {{ gameName() }} Matches</h1>
+      
+      @if (!loading() && tournaments().length > 0) {
+        <div class="relative min-w-[200px] sm:min-w-[260px]">
+          <app-dropdown 
+            [items]="tournaments()" 
+            [selectedItem]="selectedTournament()" 
+            placeholder="All Tournaments"
+            (selectionChange)="selectedTournament.set($event)">
+          </app-dropdown>
+        </div>
+      }
     </div>
 
     <!-- Loading -->
@@ -31,16 +44,16 @@
     }
 
     <!-- Empty state -->
-    @if (!loading() && !errorMsg() && matches().length === 0) {
+    @if (!loading() && !errorMsg() && filteredMatches().length === 0) {
       <div class="text-center py-20" style="color: rgba(255,255,255,0.35);">
-        No live {{ gameName() }} matches right now.
+        No past {{ gameName() }} matches found.
       </div>
     }
 
     <!-- Match list -->
-    @if (!loading() && matches().length > 0) {
+    @if (!loading() && filteredMatches().length > 0) {
       <div class="grid gap-4">
-        @for (match of matches(); track match.matchId) {
+        @for (match of filteredMatches(); track match.matchId) {
           <div class="match-card bg-white/[0.03] border border-purple-700/25 rounded-2xl p-6 hover:border-purple-500/40 transition-all duration-300" [style.animation-delay.ms]="$index * 80">
             <!-- League / tournament context -->
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
@@ -55,9 +68,7 @@
                   </span>
                 }
               </div>
-              <span class="text-[11px] font-bold text-red-400 animate-pulse tracking-wider flex items-center gap-1.5 shrink-0">
-                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> LIVE NOW
-              </span>
+              <span class="text-[11px] font-bold text-white/40 tracking-wider shrink-0">FINISHED</span>
             </div>
 
             <!-- Teams -->
@@ -94,43 +105,11 @@
               </div>
             </div>
 
-            <!-- Footer: format + streams -->
+            <!-- Footer: format -->
             <div class="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-white/[0.06] gap-2">
               <span class="text-[11px]" style="color: rgba(255,255,255,0.30);">
                 Best of {{ match.numberOfGames ?? '—' }}
               </span>
-              
-              <div class="flex flex-wrap items-center gap-2">
-                @if (match.streams && match.streams.length > 0) {
-                  @for (stream of match.streams; track stream.rawUrl) {
-                    <a [href]="stream.rawUrl" target="_blank" rel="noopener noreferrer"
-                       [class]="getStreamPlatform(stream.rawUrl) === 'YouTube' 
-                         ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
-                         : getStreamPlatform(stream.rawUrl) === 'Twitch' 
-                         ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
-                         : 'text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5'">
-                      @if (getStreamPlatform(stream.rawUrl) === 'Twitch') {
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M2.149 0L.537 4.119v16.836h5.731V24h3.224l3.045-3.045h4.657l6.269-6.269V0H2.149zm19.164 13.612l-4.298 4.298h-4.657l-3.045 3.045v-3.045H4.836V2.149h16.478v11.463zm-3.582-7.343v5.731h-2.149V6.269h2.149zm-5.731 0v5.731H9.851V6.269h2.149z"/>
-                        </svg>
-                      } @else if (getStreamPlatform(stream.rawUrl) === 'YouTube') {
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.501 5.814a3.016 3.016 0 0 0 2.122 2.136c1.872.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                        </svg>
-                      } @else {
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                      }
-                      Watch {{ getStreamPlatform(stream.rawUrl) }}
-                    </a>
-                  }
-                } @else if (match.streamUrl) {
-                  <a [href]="match.streamUrl" target="_blank" rel="noopener noreferrer"
-                     class="text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                    Watch Stream
-                  </a>
-                }
-              </div>
             </div>
           </div>
         }

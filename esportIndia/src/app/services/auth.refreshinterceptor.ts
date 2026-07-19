@@ -15,7 +15,8 @@ export const authRefreshInterceptor: HttpInterceptorFn = (req, next) => {
           {},
           { withCredentials: true }
         ).pipe(
-          switchMap(() => next(req))
+          switchMap(() => next(req)),
+          catchError((refreshErr) => throwError(() => refreshErr))
         );
       }
       return throwError(() => err);

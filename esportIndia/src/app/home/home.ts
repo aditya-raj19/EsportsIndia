@@ -4,6 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { Valorant } from '../valorant/valorant';
 import { LiveMatches } from '../live-matches/live-matches';
+import { PastMatches } from '../past-matches/past-matches';
 import { GameSlug } from '../services/matchservice';
 import { GameSection, GameSectionType } from '../game-section/game-section';
 
@@ -14,7 +15,7 @@ interface Game {
 
 @Component({
   selector: 'app-home',
-  imports: [Valorant, LiveMatches, GameSection],
+  imports: [Valorant, LiveMatches, PastMatches, GameSection],
   standalone: true,
   templateUrl: './home.html',
   styleUrl: './home.css',

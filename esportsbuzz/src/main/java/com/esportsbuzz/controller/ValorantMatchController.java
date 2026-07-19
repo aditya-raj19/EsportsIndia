@@ -1,6 +1,6 @@
 package com.esportsbuzz.controller;
 
-import com.esportsbuzz.dto.UpcomingMatchDto;
+import com.esportsbuzz.dto.ValorantMatchDto;
 import com.esportsbuzz.pandaservice.MatchCacheService;
 import com.esportsbuzz.pandaservice.PandaScoreValorantService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,17 @@ public class ValorantMatchController {
     private MatchCacheService matchCacheService;
 
     @GetMapping("/upcoming")
-    public ResponseEntity<List<UpcomingMatchDto>> upcoming() {
+    public ResponseEntity<List<ValorantMatchDto>> upcoming() {
         return ResponseEntity.ok(matchCacheService.getUpcomingMatches());
+    }
+    
+    @GetMapping("/live")
+    public ResponseEntity<List<ValorantMatchDto>> live() {
+        return ResponseEntity.ok(matchCacheService.getLiveMatches());
+    }
+
+    @GetMapping("/past")
+    public ResponseEntity<List<ValorantMatchDto>> past() {
+        return ResponseEntity.ok(matchCacheService.getPastMatches());
     }
 }
