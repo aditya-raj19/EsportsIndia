@@ -1,7 +1,7 @@
 import { Component, signal, inject, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../services/auth.service';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
 import { Valorant } from '../valorant/valorant';
 import { LiveMatches } from '../live-matches/live-matches';
@@ -19,7 +19,7 @@ interface Game {
 
 @Component({
   selector: 'app-home',
-  imports: [Valorant, LiveMatches, PastMatches, Tournaments, Rankings, GameSection],
+  imports: [Valorant, LiveMatches, PastMatches, Tournaments, Rankings, GameSection, RouterLink],
   standalone: true,
   templateUrl: './home.html',
   styleUrl: './home.css',

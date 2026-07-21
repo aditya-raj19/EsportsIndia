@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { User, UserService } from '../services/user';
 import { environment } from '../../environment/environment';
 import { AuthService } from '../services/auth.service';
+import { MatchService } from '../services/matchservice';
+import { TournamentService } from '../services/tournament.service';
 
 @Component({
   selector: 'app-login',
@@ -19,24 +21,14 @@ export class Login {
   private http = inject(HttpClient);
   private router = inject(Router);
   private authService = inject(AuthService);
-
   private userService = inject(UserService);
 
   users = signal<User[]>([]);
-
-  ngOnInit() {
-  }
 
   // ── State signals ──────────────────────────────────────────────
   loading = signal(false);
   errorMsg = signal('');
   showPassword = signal(false);
-
-  // ── Live matches ticker ────────────────────────────────────────
-  liveMatches = signal([
-    { game: 'Valorant — VCT India', team1: 'Global Esports', team2: 'Team Vitality', score1: 13, score2: 11, leading: 'team1' },
-    { game: 'BGMI — Pro League S4', team1: 'Soul Esports',   team2: 'OR Esports',   score1: 3,  score2: 4,  leading: 'team2' },
-  ]);
 
   // ── Form ───────────────────────────────────────────────────────
   loginForm = new FormGroup({

@@ -29,10 +29,10 @@
     </div>
 
     <!-- Live badge -->
-    <div class="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-full px-4 py-1.5 w-fit mb-6">
-      <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
-      <span class="text-red-500 text-xs font-medium uppercase tracking-wider">
-        {{ liveMatches().length }} matches live now
+    <div class="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 w-fit mb-6">
+      <span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+      <span class="text-primary text-xs font-medium uppercase tracking-wider">
+        LIVE SCORE TRACKING
       </span>
     </div>
 
@@ -42,49 +42,43 @@
       <span class="text-gold">Arena</span>
     </h1>
 
-    <p class="text-sm leading-relaxed max-w-sm mb-10" style="color: rgba(255,255,255,0.40);">
+    <p class="text-sm leading-relaxed max-w-sm mb-6" style="color: rgba(255,255,255,0.40);">
       Create tournaments, track live scores, and compete in
       India's fastest-growing esports platform.
     </p>
 
-    <!-- Stats -->
-    <div class="flex gap-9 mb-12">
-      <div>
-        <div class="font-rajdhani text-3xl font-bold text-white">12K+</div>
-        <div class="text-xs uppercase tracking-widest" style="color: rgba(255,255,255,0.30);">Players</div>
-      </div>
-      <div>
-        <div class="font-rajdhani text-3xl font-bold text-white">840+</div>
-        <div class="text-xs uppercase tracking-widest" style="color: rgba(255,255,255,0.30);">Tournaments</div>
-      </div>
-      <div>
-        <div class="font-rajdhani text-3xl font-bold text-white">₹2.4Cr</div>
-        <div class="text-xs uppercase tracking-widest" style="color: rgba(255,255,255,0.30);">Prize pool</div>
+    <!-- Supported Games -->
+    <div class="mb-6">
+      <div class="text-xs uppercase tracking-widest mb-2" style="color: rgba(255,255,255,0.30);">Supported Titles</div>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">Valorant</span>
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">CS2</span>
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">Dota 2</span>
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">PUBG</span>
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">League of Legends</span>
       </div>
     </div>
 
-    <!-- Live match ticker -->
-    <div>
-      <div class="text-xs uppercase tracking-widest mb-3" style="color: rgba(255,255,255,0.25);">Live matches</div>
-
-      @for (match of liveMatches(); track match.game) {
-        <div class="bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-3 mb-2">
-          <div class="text-primary text-[10px] uppercase tracking-widest font-medium mb-2">
-            {{ match.game }}
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm font-medium" style="color: rgba(255,255,255,0.65);">{{ match.team1 }}</span>
-            <span class="font-rajdhani text-xl font-bold tracking-widest">
-              <span [class.text-red-500]="match.leading === 'team1'"
-                    [style.color]="match.leading !== 'team1' ? 'rgba(255,255,255,0.30)' : null">{{ match.score1 }}</span>
-              <span class="mx-1" style="color: rgba(255,255,255,0.15);">—</span>
-              <span [class.text-red-500]="match.leading === 'team2'"
-                    [style.color]="match.leading !== 'team2' ? 'rgba(255,255,255,0.30)' : null">{{ match.score2 }}</span>
-            </span>
-            <span class="text-sm font-medium" style="color: rgba(255,255,255,0.65);">{{ match.team2 }}</span>
-          </div>
+    <!-- SEO Copy -->
+    <div class="mt-4 w-full pr-8 text-left">
+      <div class="text-xs uppercase tracking-widest mb-3" style="color: rgba(255,255,255,0.25);">Features</div>
+      
+      <div class="space-y-3">
+        <div class="bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-2.5 text-left">
+          <h2 class="text-sm font-medium text-white mb-0.5">Live Esports Scores & Match Tracking</h2>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.45);">Get real-time updates and live scores for the biggest competitive matches across India and the globe.</p>
         </div>
-      }
+        
+        <div class="bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-2.5">
+          <h2 class="text-sm font-medium text-white mb-0.5">Valorant, CS2, PUBG, & Dota 2</h2>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.45);">Track your favorite teams and follow major tournaments, from Tier S global championships to local cups.</p>
+        </div>
+        
+        <div class="bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-2.5">
+          <h2 class="text-sm font-medium text-white mb-0.5">India's Premier Gaming Hub</h2>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.45);">Join thousands of players checking up-to-date tournament brackets, team standings, and match results.</p>
+        </div>
+      </div>
     </div>
 
   </div>

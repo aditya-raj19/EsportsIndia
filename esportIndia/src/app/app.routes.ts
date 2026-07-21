@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { Home } from './home/home';
 import { Login } from './login/login';
 import { Signup} from './signup/signup';
+import { Privacy } from './privacy/privacy';
+import { Terms } from './terms/terms';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -20,4 +22,6 @@ export const routes: Routes = [
   { path: 'teams/:game', component: Home },
   { path: 'rankings', component: Home },
   { path: 'rankings/:game', component: Home },
+  { path: 'privacy', component: Privacy },
+  { path: 'terms', component: Terms },
 ];

@@ -146,6 +146,7 @@ public class PandaScoreValorantService {
                 dto.setBeginAt(matchNode.path("begin_at").asText(""));
                 dto.setLeagueName(matchNode.path("league").path("name").asText("Unknown League"));
                 dto.setTournamentName(matchNode.path("tournament").path("name").asText(""));
+                dto.setTier(matchNode.path("tournament").path("tier").asText("Unranked"));
                 dto.setSerieName(matchNode.path("serie").path("full_name").asText(""));
                 dto.setVideogameName(matchNode.path("videogame").path("name").asText(""));
                 dto.setNumberOfGames(matchNode.path("number_of_games").asInt(0));
