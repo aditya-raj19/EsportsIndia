@@ -28,6 +28,7 @@ export interface ValorantMatch {
   tournamentName: string;
   serieName: string;
   videogameName: string;
+  tier: string;
   numberOfGames: number;
   streamUrl: string;
   streams: Stream[];

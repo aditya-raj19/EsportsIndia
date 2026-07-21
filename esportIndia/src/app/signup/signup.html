@@ -28,12 +28,11 @@
       </span>
     </div>
 
-    <!-- Badge -->
-    <div class="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-1.5 w-fit mb-6">
-      <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" class="text-gold">
-        <path d="M10 2L13 8H19L14 12L16 18L10 14L4 18L6 12L1 8H7L10 2Z"/>
-      </svg>
-      <span class="text-gold text-xs font-medium uppercase tracking-wider">
+    <!-- Live badge (hidden on signup or just removed) -->
+    <!-- We can keep a badge but match the login style or keep signup style badge -->
+    <div class="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 w-fit mb-6">
+      <span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+      <span class="text-primary text-xs font-medium uppercase tracking-wider">
         Join 12,000+ players
       </span>
     </div>
@@ -44,26 +43,43 @@
       <span class="text-gold">Journey</span>
     </h1>
 
-    <p class="text-white/40 text-sm leading-relaxed max-w-sm mb-10">
+    <p class="text-sm leading-relaxed max-w-sm mb-6" style="color: rgba(255,255,255,0.40);">
       Create your account to join tournaments, track your stats,
-      and compete for real prize pools.
+      and compete for real prize pools in India's premier platform.
     </p>
 
-    <!-- Feature list -->
-    <div class="space-y-4">
-      @for (feature of features; track feature.title) {
-        <div class="flex items-start gap-3">
-          <div class="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] flex items-center justify-center shrink-0 mt-0.5">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
-              <path [attr.d]="feature.icon"/>
-            </svg>
-          </div>
-          <div>
-            <div class="text-white/85 text-sm font-medium">{{ feature.title }}</div>
-            <div class="text-white/35 text-xs mt-0.5">{{ feature.desc }}</div>
-          </div>
+    <!-- Supported Games -->
+    <div class="mb-6">
+      <div class="text-xs uppercase tracking-widest mb-2" style="color: rgba(255,255,255,0.30);">Supported Titles</div>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">Valorant</span>
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">CS2</span>
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">Dota 2</span>
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">PUBG</span>
+        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs font-medium text-white/80">League of Legends</span>
+      </div>
+    </div>
+
+    <!-- SEO Copy -->
+    <div class="mt-4 w-full pr-8 text-left">
+      <div class="text-xs uppercase tracking-widest mb-3" style="color: rgba(255,255,255,0.25);">Features</div>
+      
+      <div class="space-y-3">
+        <div class="bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-2.5 text-left">
+          <h2 class="text-sm font-medium text-white mb-0.5">Live Esports Scores & Match Tracking</h2>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.45);">Get real-time updates and live scores for the biggest competitive matches across India and the globe.</p>
         </div>
-      }
+        
+        <div class="bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-2.5">
+          <h2 class="text-sm font-medium text-white mb-0.5">Valorant, CS2, PUBG, & Dota 2</h2>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.45);">Track your favorite teams and follow major tournaments, from Tier S global championships to local cups.</p>
+        </div>
+        
+        <div class="bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-2.5">
+          <h2 class="text-sm font-medium text-white mb-0.5">India's Premier Gaming Hub</h2>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.45);">Join thousands of players checking up-to-date tournament brackets, team standings, and match results.</p>
+        </div>
+      </div>
     </div>
 
   </div>

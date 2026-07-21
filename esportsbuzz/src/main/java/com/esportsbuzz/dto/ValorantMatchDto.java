@@ -18,6 +18,7 @@ public class ValorantMatchDto {
     private String tournamentName;
     private String serieName;
     private String videogameName;
+    private String tier;
     private int numberOfGames;
     private String streamUrl; // keeping for backward compatibility
     private List<StreamDto> streams;
