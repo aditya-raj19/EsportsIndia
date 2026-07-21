@@ -1,18 +1,18 @@
 <div class="min-h-screen bg-[#0a0a0f] text-white">
     <!-- Navbar -->
     <nav class="sticky top-0 z-50 bg-[#0a0a0f]/90 backdrop-blur-md border-b border-white/10">
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <!-- Top Navigation -->
-            <div class="h-16 flex items-center justify-between">
+            <div class="h-14 sm:h-16 flex items-center justify-between">
                 <!-- Logo -->
-                <div class="flex items-center gap-3 cursor-pointer" (click)="navigateTo('/homepage')">
-                    <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center shadow-lg shadow-purple-600/30">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <div class="flex items-center gap-2 sm:gap-3 cursor-pointer flex-shrink-0" (click)="navigateTo('/homepage')">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-purple-600 flex items-center justify-center shadow-lg shadow-purple-600/30">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 20 20" fill="none">
                             <path d="M10 2L13 8H19L14 12L16 18L10 14L4 18L6 12L1 8H7L10 2Z" fill="white"/>
                         </svg>
                     </div>
-                    <div>
-                        <h1 class="font-rajdhani text-2xl font-bold text-white tracking-wider">
+                    <div class="hidden xs:block">
+                        <h1 class="font-rajdhani text-lg sm:text-xl md:text-2xl font-bold text-white tracking-wider">
                             Esports<span class="text-purple-400">Buzz</span>
                         </h1>
                     </div>
@@ -28,17 +28,17 @@
                     }
                 </div>
                 <!-- Right Side -->
-                <div class="flex items-center gap-3">
-                    <button class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition">
+                <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+                    <button class="w-8 h-8 sm:w-10 sm:h-10 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-base bg-white/5 hover:bg-white/10 transition">
                         🔔
                     </button>
                     @if(auth.isLoggedIn()) {
-                    <button (click)="onSignOut()" class="px-4 py-2 rounded-xl bg-red-500/20 border border-red-500/30
+                    <button (click)="onSignOut()" class="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl bg-red-500/20 border border-red-500/30
                    text-red-400 hover:bg-red-500/30 transition">
                         Logout
                     </button>
                     } @else {
-                    <button (click)="navigateTo('/login')" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 transition text-white font-medium shadow-lg shadow-purple-600/20">
+                    <button (click)="navigateTo('/login')" class="px-3 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl bg-purple-600 hover:bg-purple-500 transition text-white font-medium shadow-lg shadow-purple-600/20">
                         Login
                     </button>
                     }
@@ -47,7 +47,7 @@
             </div>
             <!-- Mobile navigation: horizontal scrolling keeps every section reachable on narrow screens. -->
             <div class="md:hidden -mx-6 border-t border-white/10 px-6">
-                <div class="flex gap-1 overflow-x-auto py-2 scrollbar-none">
+                <div class="flex gap-1 overflow-x-auto py-2 scrollbar-hide">
                     @for(menu of menus; track menu.route) {
                     <button (click)="navigateTo(menu.route)"
                         class="shrink-0 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
@@ -75,8 +75,8 @@
     </nav>
     <!-- Live Matches Hero Slider Section -->
     @if(isHomePage()) {
-    <section class="max-w-7xl mx-auto px-6 py-8">
-      <div (mouseenter)="stopAutoSlide()" (mouseleave)="startAutoSlide()" class="relative overflow-hidden rounded-3xl border border-purple-500/25 bg-gradient-to-br from-[#120924] via-[#0d0718] to-[#07040e] p-8 shadow-[0_20px_50px_rgba(124,58,237,0.15)]">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div (mouseenter)="stopAutoSlide()" (mouseleave)="startAutoSlide()" class="relative overflow-hidden rounded-2xl sm:rounded-2xl sm:rounded-3xl border border-purple-500/25 bg-gradient-to-br from-[#120924] via-[#0d0718] to-[#07040e] p-4 sm:p-6 md:p-4 sm:p-6 md:p-8 shadow-[0_20px_50px_rgba(124,58,237,0.15)]">
         
         <!-- Background Ambient Glows -->
         <div class="absolute -right-20 -top-20 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -116,7 +116,7 @@
         } @else if (sliderLiveMatches().length > 0) {
           @let currentMatch = sliderLiveMatches()[currentSlide()];
           
-          <div [class.slide-fade-in]="isAnimating()" class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 min-h-[260px]">
+          <div [class.slide-fade-in]="isAnimating()" class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 md:gap-8 min-h-[200px] sm:min-h-[260px]">
             
             <!-- Left Info Column -->
             <div class="flex-1 space-y-4">
@@ -130,7 +130,7 @@
                 </span>
               </div>
 
-              <h2 class="font-rajdhani text-2xl md:text-3xl font-bold text-white tracking-wide">
+              <h2 class="font-rajdhani text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-wide">
                 {{ currentMatch.leagueName || 'Official Tournament' }}
                 @if (currentMatch.tournamentName) {
                   <span class="text-white/50"> — </span>{{ currentMatch.tournamentName }}
@@ -157,7 +157,7 @@
                           <path d="M11.571 4.714h1.715v5.143h-1.715zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
                         </svg>
                       }
-                      Watch {{ getStreamPlatform(stream.rawUrl) }}
+                      <span class="hidden xs:inline">Watch</span> {{ getStreamPlatform(stream.rawUrl) }}
                     </a>
                   }
                 } @else {
@@ -187,7 +187,7 @@
                       {{ currentMatch.teams[0]?.name?.substring(0, 2) || 'T1' }}
                     </div>
                   }
-                  <span class="text-white font-semibold text-sm line-clamp-1">{{ currentMatch.teams[0]?.name || 'Team 1' }}</span>
+                  <span class="text-white font-semibold text-xs sm:text-sm line-clamp-1 px-1">{{ currentMatch.teams[0]?.name || 'Team 1' }}</span>
                 </div>
 
                 <!-- Scores -->
@@ -211,7 +211,7 @@
                       {{ currentMatch.teams[1]?.name?.substring(0, 2) || 'T2' }}
                     </div>
                   }
-                  <span class="text-white font-semibold text-sm line-clamp-1">{{ currentMatch.teams[1]?.name || 'Team 2' }}</span>
+                  <span class="text-white font-semibold text-xs sm:text-sm line-clamp-1 px-1">{{ currentMatch.teams[1]?.name || 'Team 2' }}</span>
                 </div>
 
               </div>
@@ -317,33 +317,33 @@
             </article>
             <div class="relative">
                 <div class="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-pink-600/30 blur-3xl -z-10 rounded-full"></div>
-                <div class="bg-[#0a0a0f] border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                <div class="bg-[#0a0a0f] border border-white/10 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                     <h3 class="text-xl font-bold text-white mb-6">Games Covered</h3>
                     <ul class="space-y-4">
                         <li class="flex items-center gap-4 text-gray-300 hover:text-white transition group cursor-default">
-                            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/50 transition text-xl">🎮</div>
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/50 transition text-xl">🎮</div>
                             <div>
                                 <h4 class="font-bold text-white">Valorant</h4>
                                 <p class="text-xs text-gray-500">VCT, Challengers, Ascension</p>
                             </div>
                         </li>
                         <li class="flex items-center gap-4 text-gray-300 hover:text-white transition group cursor-default">
-                            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/50 transition text-xl">🔫</div>
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/50 transition text-xl">🔫</div>
                             <div>
                                 <h4 class="font-bold text-white">Counter-Strike 2</h4>
                                 <p class="text-xs text-gray-500">Majors, IEM, BLAST Premier</p>
                             </div>
                         </li>
                         <li class="flex items-center gap-4 text-gray-300 hover:text-white transition group cursor-default">
-                            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/50 transition text-xl">⚔️</div>
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/50 transition text-xl">⚔️</div>
                             <div>
                                 <h4 class="font-bold text-white">League of Legends</h4>
                                 <p class="text-xs text-gray-500">Worlds, MSI, LCS, LEC, LCK</p>
                             </div>
                         </li>
                         <li class="flex items-center gap-4 text-gray-300 hover:text-white transition group cursor-default">
-                            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/50 transition text-xl">🔮</div>
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/50 transition text-xl">🔮</div>
                             <div>
                                 <h4 class="font-bold text-white">Dota 2</h4>
                                 <p class="text-xs text-gray-500">The International, Pro Circuit</p>
@@ -369,3 +369,5 @@
     <app-game-section [section]="gameDataSection()" [gameName]="selectedGameName()" />
     }
 </div>
+
+

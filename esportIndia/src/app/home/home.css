@@ -42,3 +42,29 @@
 }
 
 @keyframes tabIndicator { from { opacity: 0; transform: scaleX(0.5); } to { opacity: 1; transform: scaleX(1); } }
+
+/* Hide scrollbar for mobile navigation */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fade in animation for slides */
+.slide-fade-in {
+  animation: slideFadeIn 350ms ease-out;
+}
+
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
