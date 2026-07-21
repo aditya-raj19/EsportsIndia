@@ -5,6 +5,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '475px',
+      },
       fontFamily: {
         rajdhani: ['Rajdhani', 'sans-serif'],
         sans: ['Inter', 'sans-serif'],
