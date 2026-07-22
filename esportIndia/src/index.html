@@ -1,13 +1,73 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>EsportsBuzz</title>
+  <!-- Primary Meta Tags -->
+  <title>EsportsBuzz - India's Premier Esports Arena</title>
+  <meta name="title" content="EsportsBuzz - India's Premier Esports Arena">
+  <meta name="description"
+    content="EsportsBuzz is India's fastest-growing esports platform. Track live scores, join tournaments, and follow your favorite teams in Valorant, CS2, Dota 2, and PUBG.">
+  <meta name="keywords"
+    content="Esports India, live esports scores, Valorant tournaments, CS2 matches, PUBG Mobile India, Dota 2, competitive gaming, esports tracking">
+
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://esportsbuzz.in/">
+  <meta property="og:title" content="EsportsBuzz - India's Premier Esports Arena">
+  <meta property="og:description"
+    content="Track live scores, join tournaments, and follow your favorite teams in Valorant, CS2, Dota 2, and PUBG on India's fastest-growing esports platform.">
+  <meta property="og:image" content="https://esportsbuzz.in/assets/og-image.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://esportsbuzz.in/">
+  <meta property="twitter:title" content="EsportsBuzz - India's Premier Esports Arena">
+  <meta property="twitter:description"
+    content="Track live scores, join tournaments, and follow your favorite teams in Valorant, CS2, Dota 2, and PUBG.">
+  <meta property="twitter:image" content="https://esportsbuzz.in/assets/og-image.jpg">
+
+  <!-- JSON-LD Structured Data for Google -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsOrganization",
+      "name": "EsportsBuzz",
+      "url": "https://esportsbuzz.in/",
+      "logo": "https://esportsbuzz.in/favicon.ico",
+      "description": "India's premier destination for esports tournaments, live scores, and competitive gaming news.",
+      "sameAs": [
+        "https://twitter.com/esportsbuzz",
+        "https://discord.gg/esportsbuzz"
+      ],
+      "location": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Siwan",
+          "addressRegion": "Bihar",
+          "addressCountry": "IN"
+        }
+      }
+    }
+  </script>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WB4QLJSPS1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-WB4QLJSPS1');
+  </script>
 </head>
+
 <body>
   <app-root></app-root>
 </body>
+
 </html>
