@@ -6,7 +6,7 @@ import { Privacy } from './privacy/privacy';
 import { Terms } from './terms/terms';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'login', pathMatch: 'full' },
+    { path: '', redirectTo: 'homepage', pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
   { path: 'homepage', component: Home },
@@ -21,7 +21,8 @@ export const routes: Routes = [
   { path: 'teams', component: Home },
   { path: 'teams/:game', component: Home },
   { path: 'rankings', component: Home },
-  { path: 'rankings/:game', component: Home },
+  { path: 'news', component: Home },
+  { path: 'news/:game', component: Home },
   { path: 'privacy', component: Privacy },
   { path: 'terms', component: Terms },
 ];
