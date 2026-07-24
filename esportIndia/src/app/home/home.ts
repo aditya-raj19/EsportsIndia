@@ -8,6 +8,7 @@ import { LiveMatches } from '../live-matches/live-matches';
 import { PastMatches } from '../past-matches/past-matches';
 import { Tournaments } from '../tournaments/tournaments';
 import { Rankings } from '../rankings/rankings';
+import { News } from '../news/news';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { GameSection, GameSectionType } from '../game-section/game-section';
 import { TournamentService } from '../services/tournament.service';
@@ -19,7 +20,7 @@ interface Game {
 
 @Component({
   selector: 'app-home',
-  imports: [Valorant, LiveMatches, PastMatches, Tournaments, Rankings, GameSection, RouterLink],
+  imports: [Valorant, LiveMatches, PastMatches, Tournaments, Rankings, GameSection, RouterLink, News],
   standalone: true,
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -58,6 +59,7 @@ export class Home implements OnInit, OnDestroy {
     { label: 'Live', route: '/live' },
     { label: 'Upcoming', route: '/upcoming' },
     { label: 'Results', route: '/results' },
+    { label: 'News', route: '/news' },
     { label: 'Tournaments', route: '/tournaments' },
     { label: 'Teams', route: '/teams' },
     { label: 'Rankings', route: '/rankings' },
