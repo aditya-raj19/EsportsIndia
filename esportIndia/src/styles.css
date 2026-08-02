@@ -41,10 +41,20 @@
 
 /* Global, since this background pattern is reused across many pages */
 .bg-grid {
+  opacity: 0;
+  transition: opacity 0.3s ease;
   background-image:
     linear-gradient(rgba(124, 58, 237, 0.07) 1px, transparent 1px),
     linear-gradient(90deg, rgba(124, 58, 237, 0.07) 1px, transparent 1px);
   background-size: 48px 48px;
+}
+.dark .bg-grid {
+  opacity: 1;
+}
+
+.glow-purple, .glow-gold {
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .glow-purple {
@@ -55,9 +65,30 @@
   background: radial-gradient(circle, rgba(245, 158, 11, 0.10) 0%, transparent 70%);
 }
 
+.dark .glow-purple, .dark .glow-gold {
+  opacity: 1;
+}
+
 /* Reusable Match Card Animation & Styles */
+@keyframes glowingBorderFlow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 300% 0%; }
+}
+
+.animate-glowing-border {
+  background: linear-gradient(90deg, #ef4444, #00D9C0, #3b82f6, #ffb020, #ef4444);
+  background-size: 300% 100%;
+  animation: glowingBorderFlow 2.5s linear infinite;
+}
+
+.animate-glowing-border-hover {
+  background: linear-gradient(90deg, #3b82f6, #00D9C0, #a855f7, #3b82f6);
+  background-size: 300% 100%;
+  animation: glowingBorderFlow 3s linear infinite;
+}
+
 .match-card {
-  @apply rounded-2xl border border-purple-500/25 bg-white/[0.03] p-6;
+  @apply rounded-2xl;
   animation: matchEnter 420ms ease-out both;
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }

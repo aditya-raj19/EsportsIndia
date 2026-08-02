@@ -1,5 +1,6 @@
 import { Component, signal, inject, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../services/auth.service';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
@@ -12,15 +13,11 @@ import { News } from '../news/news';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { GameSection, GameSectionType } from '../game-section/game-section';
 import { TournamentService } from '../services/tournament.service';
-
-interface Game {
-  name: string;
-  slug: GameSlug;
-}
+import { GameTabs, Game } from '../shared/game-tabs/game-tabs';
 
 @Component({
   selector: 'app-home',
-  imports: [Valorant, LiveMatches, PastMatches, Tournaments, Rankings, GameSection, RouterLink, News],
+  imports: [Valorant, LiveMatches, PastMatches, Tournaments, Rankings, GameSection, News, GameTabs],
   standalone: true,
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -29,6 +26,7 @@ export class Home implements OnInit, OnDestroy {
   private matchService = inject(MatchService);
   private tournamentService = inject(TournamentService);
   private platformId = inject(PLATFORM_ID);
+  private sanitizer = inject(DomSanitizer);
 
   loading = signal(false);
   signedOut = signal(false);
@@ -38,11 +36,39 @@ export class Home implements OnInit, OnDestroy {
   upcomingMatchesCount = signal<number>(0);
   tournamentsCount = signal<number>(0);
 
+  isDarkMode = signal<boolean>(false);
+
   sliderLiveMatches = signal<UpcomingMatch[]>([]);
-  currentSlide = signal<number>(0);
-  isAnimating = signal<boolean>(false);
   isLoadingSlider = signal<boolean>(true);
-  private sliderTimer?: ReturnType<typeof setInterval>;
+
+  heroNews = signal([
+    {
+      title: 'Sentinels Dominate in VCT Americas Grand Finals',
+      excerpt: 'TenZ and Zekken show up massive as Sentinels take down LOUD 3-0. The team looks completely unstoppable heading into the global playoffs next month.',
+      timeAgo: '2 hours ago',
+      category: 'Breaking News',
+      imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop',
+      route: '/news'
+    },
+    {
+      title: 'CS2 Major Update: New Active Duty Map Pool',
+      excerpt: 'Valve surprises the community with a massive update, rotating Overpass out and bringing back a fan-favorite map with complete visual overhauls.',
+      timeAgo: '5 hours ago',
+      category: 'CS2 Updates',
+      imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop',
+      route: '/news'
+    },
+    {
+      title: 'Faker Extends Contract with T1 Through 2026',
+      excerpt: 'The Unkillable Demon King will continue his legacy with T1 for another two years, aiming for yet another World Championship title.',
+      timeAgo: '1 day ago',
+      category: 'LoL Esports',
+      imageUrl: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=2165&auto=format&fit=crop',
+      route: '/news'
+    }
+  ]);
+  currentNewsIndex = signal(0);
+  private newsSliderTimer?: ReturnType<typeof setInterval>;
 
   selectedGame = 'all';
   readonly games: Game[] = [
@@ -52,6 +78,8 @@ export class Home implements OnInit, OnDestroy {
     { name: 'League of Legends', slug: 'lol' },
     { name: 'Dota 2', slug: 'dota2' },
     { name: 'PUBG', slug: 'pubg' },
+    { name: 'BGMI', slug: 'bgmi', comingSoon: true },
+    { name: 'Free Fire', slug: 'freefire', comingSoon: true },
   ];
 
   readonly menus = [
@@ -68,16 +96,69 @@ export class Home implements OnInit, OnDestroy {
   constructor(public auth: AuthService, private router: Router) {}
 
   ngOnInit() {
+    this.initTheme();
     this.syncPageFromUrl();
     this.loadStats();
     this.loadSliderMatches();
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(() => this.syncPageFromUrl());
+      
+    if (isPlatformBrowser(this.platformId)) {
+      this.startNewsSlider();
+    }
+  }
+
+  private initTheme() {
+    if (isPlatformBrowser(this.platformId)) {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        this.isDarkMode.set(true);
+        document.documentElement.classList.add('dark');
+      } else {
+        this.isDarkMode.set(false);
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }
+
+  toggleTheme() {
+    this.isDarkMode.set(!this.isDarkMode());
+    if (isPlatformBrowser(this.platformId)) {
+      if (this.isDarkMode()) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    }
   }
 
   ngOnDestroy() {
-    this.stopAutoSlide();
+    this.stopNewsSlider();
+  }
+
+  private startNewsSlider() {
+    this.newsSliderTimer = setInterval(() => {
+      this.nextNews();
+    }, 6000);
+  }
+
+  private stopNewsSlider() {
+    if (this.newsSliderTimer) clearInterval(this.newsSliderTimer);
+  }
+
+  private nextNews() {
+    this.currentNewsIndex.update(i => (i + 1) % this.heroNews().length);
+  }
+
+  setNews(index: number) {
+    this.currentNewsIndex.set(index);
+    this.stopNewsSlider();
+    if (isPlatformBrowser(this.platformId)) {
+      this.startNewsSlider();
+    }
   }
 
   private loadSliderMatches() {
@@ -85,63 +166,12 @@ export class Home implements OnInit, OnDestroy {
     this.matchService.getAllLiveMatches().subscribe({
       next: (allLive) => {
         this.sliderLiveMatches.set(allLive);
-        if (allLive.length > 1 && isPlatformBrowser(this.platformId)) {
-          this.startAutoSlide();
-        }
-        this.triggerSlideAnim();
         this.isLoadingSlider.set(false);
       },
       error: () => {
         this.isLoadingSlider.set(false);
       },
     });
-  }
-
-  startAutoSlide() {
-    this.stopAutoSlide();
-    this.sliderTimer = setInterval(() => {
-      this.nextSlide();
-    }, 5000);
-  }
-
-  stopAutoSlide() {
-    if (this.sliderTimer) {
-      clearInterval(this.sliderTimer);
-      this.sliderTimer = undefined;
-    }
-  }
-
-  nextSlide() {
-    const total = this.sliderLiveMatches().length;
-    if (total === 0) return;
-    this.triggerSlideAnim();
-    this.currentSlide.set((this.currentSlide() + 1) % total);
-  }
-
-  prevSlide() {
-    const total = this.sliderLiveMatches().length;
-    if (total === 0) return;
-    this.triggerSlideAnim();
-    this.currentSlide.set((this.currentSlide() - 1 + total) % total);
-  }
-
-  goToSlide(index: number) {
-    if (this.currentSlide() === index) return;
-    this.triggerSlideAnim();
-    this.currentSlide.set(index);
-  }
-
-  private triggerSlideAnim() {
-    this.isAnimating.set(true);
-    setTimeout(() => this.isAnimating.set(false), 350);
-  }
-
-  getStreamPlatform(url: string): string {
-    if (!url) return 'Stream';
-    const lowerUrl = url.toLowerCase();
-    if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) return 'YouTube';
-    if (lowerUrl.includes('twitch.tv')) return 'Twitch';
-    return 'Stream';
   }
 
   private loadStats() {
@@ -174,6 +204,8 @@ export class Home implements OnInit, OnDestroy {
     });
   }
 
+
+
   onCancel() {
     this.router.navigate(['/homepage']);
   }
@@ -182,11 +214,16 @@ export class Home implements OnInit, OnDestroy {
     this.router.navigate([route]);
   }
 
+  navigateToMatch(match: UpcomingMatch): void {
+    this.router.navigate(['/match', match.matchId], {
+      state: { match }
+    });
+  }
+
   isHomePage(): boolean { return this.router.url === '/homepage'; }
 
   showMatchSection(): boolean {
-    return ['upcoming', 'live', 'results', 'tournaments', 'teams', 'rankings']
-      .some((section) => this.router.url === `/${section}` || this.router.url.startsWith(`/${section}/`));
+    return !this.isHomePage();
   }
 
   isActive(route: string): boolean {
@@ -194,15 +231,15 @@ export class Home implements OnInit, OnDestroy {
   }
 
   navigateGame(game: Game): void {
-    const section = this.currentSection() ?? 'upcoming';
+    let section = this.currentSection() ?? 'upcoming';
+    if (section === 'homepage') {
+      section = 'upcoming';
+    }
     this.selectedGame = game.slug;
     this.loadStats();
     this.router.navigate([section, game.slug]);
   }
 
-  isGameActive(game: Game): boolean {
-    return this.selectedGame === game.slug;
-  }
 
   selectedGameName(): string {
     return this.games.find((game) => game.slug === this.selectedGame)?.name ?? 'Game';

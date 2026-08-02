@@ -1,4 +1,5 @@
 import { Component, input, inject, signal, computed, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { Dropdown } from '../dropdown/dropdown';
 
@@ -14,6 +15,7 @@ export class PastMatches implements OnInit, OnChanges {
   readonly gameName = input.required<string>();
 
   private readonly matchService = inject(MatchService);
+  private readonly router = inject(Router);
   readonly matches = signal<UpcomingMatch[]>([]);
   readonly loading = signal(false);
   readonly errorMsg = signal<string | null>(null);
@@ -62,6 +64,12 @@ export class PastMatches implements OnInit, OnChanges {
         this.errorMsg.set('Past match data is temporarily unavailable.');
         this.loading.set(false);
       },
+    });
+  }
+
+  navigateToMatch(match: UpcomingMatch): void {
+    this.router.navigate(['/match', match.matchId], {
+      state: { match }
     });
   }
 }

@@ -1,0 +1,25 @@
+<div class="flex justify-start md:justify-center gap-2 sm:gap-3 overflow-x-auto p-1.5 sm:p-2 scrollbar-hide">
+  @for(game of games(); track game.slug) {
+    <div (click)="onSelect(game)" 
+         [class.cursor-not-allowed]="game.comingSoon"
+         [class.opacity-70]="game.comingSoon"
+         class="relative shrink-0 rounded-full cursor-pointer group transition-all overflow-hidden p-[1px] {{ selectedGame() === game.slug ? 'bg-blue-600 dark:bg-eb-amber shadow-md' : 'bg-slate-200 dark:bg-eb-border' }}">
+      
+      <!-- Animated Glow Background -->
+      <div class="absolute inset-[-150%] z-0 transition-opacity duration-300 bg-[conic-gradient(from_90deg,transparent_0%,transparent_70%,#3b82f6_100%)] dark:bg-[conic-gradient(from_90deg,transparent_0%,transparent_70%,#00D9C0_100%)] animate-[spin_2.5s_linear_infinite]"
+           [class.opacity-100]="selectedGame() === game.slug"
+           [class.opacity-0]="selectedGame() !== game.slug"
+           [class.group-hover:opacity-100]="!game.comingSoon"></div>
+      
+      <!-- Inner Button -->
+      <button class="relative z-10 flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-sm font-semibold rounded-full transition-colors focus:outline-none {{ selectedGame() === game.slug ? 'bg-blue-600 text-white dark:bg-eb-surface dark:text-eb-amber' : 'bg-white text-slate-700 hover:bg-slate-50 dark:bg-eb-surface2 dark:text-eb-muted dark:hover:bg-white/5 dark:hover:text-white' }}">
+        <span>{{ game.name }}</span>
+        @if (game.comingSoon) {
+          <span class="bg-red-500 text-white text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm leading-none uppercase tracking-wider">SOON</span>
+        }
+      </button>
+    </div>
+  }
+  <!-- Spacer to preserve right padding on scroll -->
+  <div class="shrink-0 w-1 sm:w-2"></div>
+</div>

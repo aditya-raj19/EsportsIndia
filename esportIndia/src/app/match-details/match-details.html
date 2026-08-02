@@ -1,0 +1,350 @@
+<div class="min-h-screen bg-slate-50 text-slate-900 dark:bg-eb-bg dark:text-eb-ink transition-colors duration-300">
+
+  <!-- Page Sub-Header / Breadcrumb Title Bar -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-2">
+    <div class="flex items-center gap-3">
+      <button (click)="goBack()" class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 dark:bg-eb-surface dark:border-eb-border dark:hover:bg-eb-surface2 dark:text-white transition active:scale-95 shadow-sm">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <div>
+        <h1 class="font-rajdhani text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-wider">
+          Match <span class="text-blue-600 dark:text-eb-cyan">Center & Stats</span>
+        </h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="flex items-center justify-center py-32">
+    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 dark:border-purple-500"></div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMsg()" class="max-w-3xl mx-auto px-4 sm:px-6 py-16 text-center">
+    <div class="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-500">
+      <svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+    </div>
+    <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">Something went wrong</h2>
+    <p class="text-xs sm:text-sm text-slate-500 dark:text-gray-400">{{ errorMsg() }}</p>
+    <button (click)="goBack()" class="mt-6 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white dark:bg-purple-600 dark:hover:bg-purple-700 font-semibold text-xs sm:text-sm transition">
+      ← Go Back
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading() && !errorMsg() && match()" class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-10">
+
+    <!-- Hero Top Section: Stream (Left) | Score (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch fade-in-up">
+
+      <!-- Stream Broadcast Video Player (Left Side) -->
+      @if (mainStreamSafeUrl()) {
+        <div class="lg:col-span-7 flex flex-col justify-center bg-black rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 dark:border-eb-border shadow-lg aspect-video">
+          <iframe [src]="mainStreamSafeUrl()!"
+                  frameborder="0" allowfullscreen="true" scrolling="no"
+                  class="w-full h-full"></iframe>
+        </div>
+      }
+
+      <!-- Hero Scoreboard Card (Right Side) -->
+      <div [class]="mainStreamSafeUrl() ? 'lg:col-span-5 flex flex-col justify-between rounded-2xl sm:rounded-3xl overflow-hidden border bg-white border-slate-200 shadow-sm dark:bg-eb-surface2 dark:border-eb-border p-5 sm:p-6' : 'lg:col-span-12 rounded-2xl sm:rounded-3xl overflow-hidden border bg-white border-slate-200 shadow-sm dark:bg-eb-surface2 dark:border-eb-border p-6 sm:p-8'">
+
+        <!-- Match Context Bar -->
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-3">
+          <span *ngIf="match()!.videogameName" class="px-2.5 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full bg-blue-100 text-blue-700 border border-blue-200 dark:bg-purple-500/15 dark:text-purple-400 dark:border-purple-500/30">
+            {{ match()!.videogameName }}
+          </span>
+          <span class="px-2.5 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full border" [ngClass]="getStatusColor(match()!.status)">
+            <span *ngIf="match()!.status === 'running' || match()!.status === 'live'" class="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse mr-1"></span>
+            {{ getStatusLabel(match()!.status) }}
+          </span>
+          <span *ngIf="match()!.tier" class="px-2.5 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full border" [ngClass]="getTierColor(match()!.tier)">
+            {{ match()!.tier }}-Tier
+          </span>
+        </div>
+
+        <!-- League & Tournament Name -->
+        <div class="mb-4">
+          <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug line-clamp-1">{{ match()!.leagueName }}</h2>
+          <p class="text-xs text-slate-500 dark:text-gray-400 line-clamp-1">
+            {{ match()!.tournamentName }}
+            <span *ngIf="match()!.serieName"> · {{ match()!.serieName }}</span>
+          </p>
+        </div>
+
+        <!-- Scoreboard -->
+        <div class="py-4">
+          <div class="flex items-center justify-between sm:justify-center gap-2 sm:gap-6">
+            <!-- Team 1 -->
+            <div class="flex-1 flex flex-col items-center text-center min-w-0">
+              <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-slate-100 dark:bg-white/95 p-2 flex items-center justify-center shadow-md mb-2 shrink-0">
+                <img *ngIf="match()!.teams[0]?.imageUrl && match()!.teams[0].imageUrl !== 'null'" [src]="match()!.teams[0].imageUrl" [alt]="match()!.teams[0]?.name" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'">
+                <span *ngIf="!match()!.teams[0]?.imageUrl || match()!.teams[0].imageUrl === 'null'" class="text-slate-400 dark:text-gray-400 font-bold text-base sm:text-xl">{{ match()!.teams[0]?.acronym || match()!.teams[0]?.name?.substring(0,2) || 'T1' }}</span>
+              </div>
+              <h3 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-1 w-full">{{ match()!.teams[0]?.name || 'TBD' }}</h3>
+            </div>
+
+            <!-- Score -->
+            <div class="flex flex-col items-center gap-1 shrink-0 px-2">
+              <div class="flex items-center gap-2">
+                <span class="font-rajdhani text-3xl sm:text-5xl font-black {{ (match()!.teams[0]?.score ?? 0) > (match()!.teams[1]?.score ?? 0) ? 'text-blue-600 dark:text-eb-amber' : 'text-slate-400 dark:text-gray-500' }}">
+                  {{ match()!.teams[0]?.score ?? 0 }}
+                </span>
+                <span class="text-slate-300 dark:text-gray-600 text-xl font-light">:</span>
+                <span class="font-rajdhani text-3xl sm:text-5xl font-black {{ (match()!.teams[1]?.score ?? 0) > (match()!.teams[0]?.score ?? 0) ? 'text-blue-600 dark:text-eb-amber' : 'text-slate-400 dark:text-gray-500' }}">
+                  {{ match()!.teams[1]?.score ?? 0 }}
+                </span>
+              </div>
+              <span class="text-[10px] text-slate-500 dark:text-gray-400 font-semibold uppercase tracking-wider">
+                Best of {{ match()!.numberOfGames || '—' }}
+              </span>
+            </div>
+
+            <!-- Team 2 -->
+            <div class="flex-1 flex flex-col items-center text-center min-w-0">
+              <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-slate-100 dark:bg-white/95 p-2 flex items-center justify-center shadow-md mb-2 shrink-0">
+                <img *ngIf="match()!.teams[1]?.imageUrl && match()!.teams[1].imageUrl !== 'null'" [src]="match()!.teams[1].imageUrl" [alt]="match()!.teams[1]?.name" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'">
+                <span *ngIf="!match()!.teams[1]?.imageUrl || match()!.teams[1].imageUrl === 'null'" class="text-slate-400 dark:text-gray-400 font-bold text-base sm:text-xl">{{ match()!.teams[1]?.acronym || match()!.teams[1]?.name?.substring(0,2) || 'T2' }}</span>
+              </div>
+              <h3 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-1 w-full">{{ match()!.teams[1]?.name || 'TBD' }}</h3>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Navigation Tabs (Touch Horizontal Swipe) -->
+    <div class="mt-4 sm:mt-8 flex gap-1 bg-slate-100 border border-slate-200 dark:bg-white/5 dark:border-white/10 p-1 rounded-xl overflow-x-auto scrollbar-none">
+      <button (click)="setTab('overview')"
+              class="flex-1 min-w-[85px] sm:min-w-[90px] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap {{ activeTab() === 'overview' ? 'bg-white text-slate-900 shadow-sm dark:bg-white/10 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white' }}">
+        Overview
+      </button>
+      <button (click)="setTab('teams')"
+              class="flex-1 min-w-[115px] sm:min-w-[130px] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap {{ activeTab() === 'teams' ? 'bg-white text-slate-900 shadow-sm dark:bg-white/10 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white' }}">
+        Teams & Lineups
+      </button>
+      <button (click)="setTab('streams')"
+              class="flex-1 min-w-[105px] sm:min-w-[110px] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap {{ activeTab() === 'streams' ? 'bg-white text-slate-900 shadow-sm dark:bg-white/10 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white' }}">
+        Streams ({{ match()!.streams?.length || 0 }})
+      </button>
+      <button (click)="setTab('standings')"
+              class="flex-1 min-w-[125px] sm:min-w-[140px] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap {{ activeTab() === 'standings' ? 'bg-white text-slate-900 shadow-sm dark:bg-white/10 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white' }}">
+        Standings
+      </button>
+    </div>
+
+    <!-- TAB 1: OVERVIEW -->
+    <div *ngIf="activeTab() === 'overview'" class="mt-4 sm:mt-6 space-y-4 sm:space-y-6 fade-in-up">
+
+      <!-- Quick Roster Overview comparison -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <!-- Team 1 Brief -->
+        <div class="rounded-2xl border bg-white border-slate-200 shadow-sm dark:bg-white/[0.02] dark:border-white/10 p-4 sm:p-5">
+          <div class="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-white/5">
+            <h3 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2 truncate">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0"></span>
+              {{ match()!.teams[0]?.name || 'Team 1' }} Lineup
+            </h3>
+            <span class="text-[10px] sm:text-xs font-semibold text-blue-600 dark:text-purple-400 shrink-0">Roster Stats</span>
+          </div>
+          <div class="space-y-1.5">
+            <div *ngFor="let p of team1Roster()" class="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-slate-50 dark:bg-white/5">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-xs sm:text-sm">{{ p.flag }}</span>
+                <span class="font-bold text-xs text-slate-900 dark:text-white truncate max-w-[90px] sm:max-w-[120px]">{{ p.handle }}</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 dark:text-gray-400 font-medium truncate hidden xs:inline">({{ p.role }})</span>
+              </div>
+              <div class="flex items-center gap-2 sm:gap-3 shrink-0 text-xs">
+                <span class="font-mono text-[10px] sm:text-xs text-slate-600 dark:text-gray-300">{{ p.kda }}</span>
+                <span class="font-bold text-[10px] sm:text-xs text-blue-600 dark:text-purple-400 bg-blue-50 dark:bg-purple-500/10 px-1.5 py-0.5 rounded">{{ p.rating }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team 2 Brief -->
+        <div class="rounded-2xl border bg-white border-slate-200 shadow-sm dark:bg-white/[0.02] dark:border-white/10 p-4 sm:p-5">
+          <div class="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-white/5">
+            <h3 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2 truncate">
+              <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0"></span>
+              {{ match()!.teams[1]?.name || 'Team 2' }} Lineup
+            </h3>
+            <span class="text-[10px] sm:text-xs font-semibold text-orange-600 dark:text-amber-400 shrink-0">Roster Stats</span>
+          </div>
+          <div class="space-y-1.5">
+            <div *ngFor="let p of team2Roster()" class="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-slate-50 dark:bg-white/5">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-xs sm:text-sm">{{ p.flag }}</span>
+                <span class="font-bold text-xs text-slate-900 dark:text-white truncate max-w-[90px] sm:max-w-[120px]">{{ p.handle }}</span>
+                <span class="text-[9px] sm:text-[10px] text-slate-500 dark:text-gray-400 font-medium truncate hidden xs:inline">({{ p.role }})</span>
+              </div>
+              <div class="flex items-center gap-2 sm:gap-3 shrink-0 text-xs">
+                <span class="font-mono text-[10px] sm:text-xs text-slate-600 dark:text-gray-300">{{ p.kda }}</span>
+                <span class="font-bold text-[10px] sm:text-xs text-orange-600 dark:text-amber-400 bg-orange-50 dark:bg-amber-500/10 px-1.5 py-0.5 rounded">{{ p.rating }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: TEAMS & LINEUPS -->
+    <div *ngIf="activeTab() === 'teams'" class="mt-4 sm:mt-6 space-y-6 sm:space-y-8 fade-in-up">
+
+      <!-- Team 1 Full Roster Card -->
+      <div class="rounded-2xl border bg-white border-slate-200 shadow-sm dark:bg-white/[0.02] dark:border-white/10 p-4 sm:p-6">
+        <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-100 dark:border-white/5">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-100 dark:bg-white/95 p-1.5 sm:p-2 flex items-center justify-center shadow-sm shrink-0">
+            <img *ngIf="match()!.teams[0]?.imageUrl && match()!.teams[0].imageUrl !== 'null'" [src]="match()!.teams[0].imageUrl" class="max-w-full max-h-full object-contain">
+            <span *ngIf="!match()!.teams[0]?.imageUrl || match()!.teams[0].imageUrl === 'null'" class="font-bold text-slate-400 text-xs">T1</span>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white line-clamp-1">{{ match()!.teams[0]?.name || 'Team 1' }}</h3>
+            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-gray-400">Starting Roster & Player Ratings</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto scrollbar-none">
+          <table class="w-full text-left text-xs min-w-[440px]">
+            <thead>
+              <tr class="border-b border-slate-100 dark:border-white/5 text-[9px] sm:text-[10px] uppercase text-slate-500 dark:text-gray-400 font-bold tracking-wider">
+                <th class="py-2 px-3">Player</th>
+                <th class="py-2 px-3">Role</th>
+                <th class="py-2 px-3">K / D / A</th>
+                <th class="py-2 px-3">Headshot %</th>
+                <th class="py-2 px-3 text-right">Rating</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-white/5">
+              <tr *ngFor="let p of team1Roster()" class="hover:bg-slate-50 dark:hover:bg-white/5">
+                <td class="py-2.5 px-3 flex items-center gap-2 font-bold text-slate-900 dark:text-white">
+                  <span>{{ p.flag }}</span>
+                  <span class="truncate max-w-[110px]">{{ p.handle }}</span>
+                </td>
+                <td class="py-2.5 px-3 text-slate-600 dark:text-gray-300 font-medium">{{ p.role }}</td>
+                <td class="py-2.5 px-3 font-mono text-slate-600 dark:text-gray-300">{{ p.kda }}</td>
+                <td class="py-2.5 px-3 text-slate-600 dark:text-gray-300">{{ p.headshotPct }}</td>
+                <td class="py-2.5 px-3 text-right font-black text-blue-600 dark:text-purple-400">{{ p.rating }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Team 2 Full Roster Card -->
+      <div class="rounded-2xl border bg-white border-slate-200 shadow-sm dark:bg-white/[0.02] dark:border-white/10 p-4 sm:p-6">
+        <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-100 dark:border-white/5">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-100 dark:bg-white/95 p-1.5 sm:p-2 flex items-center justify-center shadow-sm shrink-0">
+            <img *ngIf="match()!.teams[1]?.imageUrl && match()!.teams[1].imageUrl !== 'null'" [src]="match()!.teams[1].imageUrl" class="max-w-full max-h-full object-contain">
+            <span *ngIf="!match()!.teams[1]?.imageUrl || match()!.teams[1].imageUrl === 'null'" class="font-bold text-slate-400 text-xs">T2</span>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white line-clamp-1">{{ match()!.teams[1]?.name || 'Team 2' }}</h3>
+            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-gray-400">Starting Roster & Player Ratings</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto scrollbar-none">
+          <table class="w-full text-left text-xs min-w-[440px]">
+            <thead>
+              <tr class="border-b border-slate-100 dark:border-white/5 text-[9px] sm:text-[10px] uppercase text-slate-500 dark:text-gray-400 font-bold tracking-wider">
+                <th class="py-2 px-3">Player</th>
+                <th class="py-2 px-3">Role</th>
+                <th class="py-2 px-3">K / D / A</th>
+                <th class="py-2 px-3">Headshot %</th>
+                <th class="py-2 px-3 text-right">Rating</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-white/5">
+              <tr *ngFor="let p of team2Roster()" class="hover:bg-slate-50 dark:hover:bg-white/5">
+                <td class="py-2.5 px-3 flex items-center gap-2 font-bold text-slate-900 dark:text-white">
+                  <span>{{ p.flag }}</span>
+                  <span class="truncate max-w-[110px]">{{ p.handle }}</span>
+                </td>
+                <td class="py-2.5 px-3 text-slate-600 dark:text-gray-300 font-medium">{{ p.role }}</td>
+                <td class="py-2.5 px-3 font-mono text-slate-600 dark:text-gray-300">{{ p.kda }}</td>
+                <td class="py-2.5 px-3 text-slate-600 dark:text-gray-300">{{ p.headshotPct }}</td>
+                <td class="py-2.5 px-3 text-right font-black text-orange-600 dark:text-amber-400">{{ p.rating }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 3: STREAMS -->
+    <div *ngIf="activeTab() === 'streams'" class="mt-4 sm:mt-6 space-y-4 sm:space-y-6 fade-in-up">
+      <div *ngIf="match()!.streams && match()!.streams.length > 0">
+        <h3 class="text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-3">Available Broadcast Stream Links</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <a *ngFor="let stream of match()!.streams" [href]="stream.rawUrl" target="_blank" rel="noopener noreferrer"
+             class="p-3.5 rounded-xl border flex items-center justify-between transition-all hover:-translate-y-0.5 hover:shadow-md {{ getStreamPlatform(stream.rawUrl) === 'Kick' ? 'bg-[#53FC18]/10 border-[#53FC18]/30 text-emerald-800 dark:bg-[#53FC18]/15 dark:border-[#53FC18]/40 dark:text-[#53FC18]' : getStreamPlatform(stream.rawUrl) === 'YouTube' ? 'bg-red-50 border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400' : 'bg-purple-50 border-purple-200 text-purple-600 dark:bg-purple-500/10 dark:border-purple-500/20 dark:text-purple-400' }}">
+            <div class="flex items-center gap-2.5">
+              <span class="font-bold text-xs sm:text-sm">{{ getStreamPlatform(stream.rawUrl) }} Broadcast</span>
+              <span *ngIf="stream.language" class="text-[10px] uppercase opacity-75">({{ stream.language }})</span>
+            </div>
+            <span class="text-xs font-semibold underline">Watch Stream →</span>
+          </a>
+        </div>
+      </div>
+
+      <div *ngIf="!match()!.streams || match()!.streams.length === 0" class="rounded-2xl border bg-white border-slate-200 dark:bg-white/[0.02] dark:border-white/10 p-6 sm:p-8 text-center">
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-gray-400">No streams available for this match.</p>
+      </div>
+    </div>
+
+    <!-- TAB 4: STANDINGS -->
+    <div *ngIf="activeTab() === 'standings'" class="mt-4 sm:mt-6 fade-in-up">
+      <div *ngIf="standingsLoading()" class="flex items-center justify-center py-16">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-purple-500"></div>
+      </div>
+
+      <div *ngIf="!standingsLoading() && standings().length === 0" class="py-12 sm:py-16 text-center rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/[0.02] px-4">
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-gray-400">No standings data currently available for {{ match()!.leagueName }}.</p>
+      </div>
+
+      <div *ngIf="!standingsLoading() && standings().length > 0" class="rounded-2xl border bg-white border-slate-200 shadow-sm dark:bg-white/[0.02] dark:border-white/10 dark:shadow-none overflow-hidden">
+        <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
+          <h3 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-1">{{ match()!.leagueName }} — Live Standings</h3>
+        </div>
+
+        <div class="overflow-x-auto scrollbar-none">
+          <div class="min-w-[440px]">
+            <div class="grid grid-cols-[45px_1fr_50px_50px_50px_50px] sm:grid-cols-[60px_1fr_80px_80px_80px_80px] px-3 sm:px-4 py-2.5 sm:py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/[0.03] text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-gray-500">
+              <div>Rank</div>
+              <div>Team</div>
+              <div class="text-center">W</div>
+              <div class="text-center">L</div>
+              <div class="text-center">T</div>
+              <div class="text-center">Pts</div>
+            </div>
+
+            <div *ngFor="let s of standings(); let i = index"
+                 class="grid grid-cols-[45px_1fr_50px_50px_50px_50px] sm:grid-cols-[60px_1fr_80px_80px_80px_80px] px-3 sm:px-4 py-2.5 sm:py-3 items-center border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition {{ s.teamName === match()!.teams[0]?.name || s.teamName === match()!.teams[1]?.name ? 'bg-blue-50/70 dark:bg-purple-500/10 font-bold' : '' }}">
+              <div class="font-black text-xs sm:text-sm {{ i === 0 ? 'text-yellow-500' : i === 1 ? 'text-slate-400 dark:text-gray-400' : i === 2 ? 'text-orange-400' : 'text-slate-500 dark:text-gray-500' }}">
+                #{{ s.rank }}
+              </div>
+              <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-100 dark:bg-white/95 p-1 flex items-center justify-center shadow-sm shrink-0">
+                  <img *ngIf="s.teamImageUrl" [src]="s.teamImageUrl" [alt]="s.teamName" class="max-w-full max-h-full object-contain">
+                  <span *ngIf="!s.teamImageUrl" class="text-[9px] sm:text-[10px] font-bold text-slate-400 dark:text-gray-400">{{ s.teamAcronym || s.teamName?.substring(0,2) }}</span>
+                </div>
+                <div class="min-w-0">
+                  <div class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate">{{ s.teamName }}</div>
+                  <div *ngIf="s.teamAcronym" class="text-[9px] sm:text-[10px] text-slate-500 dark:text-gray-500">{{ s.teamAcronym }}</div>
+                </div>
+              </div>
+              <div class="text-center font-bold text-xs sm:text-sm text-green-600 dark:text-green-400">{{ s.wins }}</div>
+              <div class="text-center font-bold text-sm text-red-500 dark:text-red-400">{{ s.losses }}</div>
+              <div class="text-center font-bold text-xs sm:text-sm text-slate-500 dark:text-gray-400">{{ s.ties }}</div>
+              <div class="text-center font-black text-xs sm:text-sm text-slate-900 dark:text-white">{{ s.points }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
