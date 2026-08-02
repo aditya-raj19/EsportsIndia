@@ -1,10 +1,4 @@
-<div class="min-h-screen bg-[#0a0a0f] font-sans relative overflow-hidden px-6 py-12">
-  <!-- Background grid -->
-  <div class="absolute inset-0 pointer-events-none bg-grid"></div>
-
-  <!-- Glow blobs -->
-  <div class="absolute w-[500px] h-[500px] rounded-full pointer-events-none -top-32 -left-24 glow-purple"></div>
-  <div class="absolute w-[350px] h-[350px] rounded-full pointer-events-none -bottom-20 right-16 glow-gold"></div>
+<div class="min-h-screen bg-slate-50 dark:bg-eb-bg font-sans relative overflow-hidden px-6 py-12 transition-colors duration-300">
 
   <div class="relative z-10 max-w-5xl mx-auto">
     <!-- Header & Filter -->
@@ -14,7 +8,7 @@
           <span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
           <span class="text-purple-400 text-xs font-medium uppercase tracking-wider">Results</span>
         </div>
-        <h1 class="font-rajdhani text-4xl font-bold text-white flex items-center gap-3">
+        <h1 class="font-rajdhani text-4xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
           Past {{ gameName() }} Matches
           @if (!loading() && filteredMatches().length > 0) {
             <span class="text-xs font-bold px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/30 tracking-wider">
@@ -52,7 +46,7 @@
 
     <!-- Empty state -->
     @if (!loading() && !errorMsg() && filteredMatches().length === 0) {
-      <div class="text-center py-20" style="color: rgba(255,255,255,0.35);">
+      <div class="text-center py-20 text-slate-500 dark:text-white/35">
         No past {{ gameName() }} matches found.
       </div>
     }
@@ -61,62 +55,68 @@
     @if (!loading() && filteredMatches().length > 0) {
       <div class="grid gap-4">
         @for (match of filteredMatches(); track match.matchId) {
-          <div class="match-card bg-white/[0.03] border border-purple-700/25 rounded-2xl p-6 hover:border-purple-500/40 transition-all duration-300" [style.animation-delay.ms]="$index * 80">
-            <!-- League / tournament context -->
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <div class="flex flex-wrap items-center gap-2 min-w-0">
-                <span class="text-primary text-[11px] uppercase tracking-widest font-bold">
-                  {{ match.leagueName ?? 'Unknown League' }}
-                </span>
-                @if (match.serieName) {
-                  <span class="text-white/30">•</span>
-                  <span class="text-xs sm:text-sm font-medium text-white/80">
-                    {{ match.serieName }}
+          <!-- Match Card with Animated Glow -->
+          <div (click)="navigateToMatch(match)" class="relative match-card rounded-2xl p-[1px] bg-slate-200 dark:bg-eb-border overflow-hidden cursor-pointer shadow-sm hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(0,217,192,0.15)] hover:-translate-y-0.5 transition-all duration-300 group" [style.animation-delay.ms]="$index * 80">
+            <!-- Animated Glow Background (Flows strictly along border on hover) -->
+            <div class="absolute inset-0 z-0 animate-glowing-border-hover opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <!-- Inner Content (Matches standard site dark surface) -->
+            <div class="relative z-10 bg-white dark:bg-eb-surface2 group-hover:bg-slate-50 dark:group-hover:bg-[#22283a] rounded-[15px] p-6 h-full flex flex-col transition-colors">
+              <!-- League / tournament context -->
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <div class="flex flex-wrap items-center gap-2 min-w-0">
+                  <span class="text-primary text-[11px] uppercase tracking-widest font-bold">
+                    {{ match.leagueName ?? 'Unknown League' }}
                   </span>
-                }
-              </div>
-              <span class="text-[11px] font-bold text-white/40 tracking-wider shrink-0">FINISHED</span>
-            </div>
-
-            <!-- Teams -->
-            <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
-              <div class="flex items-center gap-1.5 sm:gap-3 min-w-0">
-                @if (match.teams?.[0]; as team0) {
-                  @if (team0.imageUrl) {
-                    <img [src]="team0.imageUrl" [alt]="team0.name ?? 'Team'"
-                         class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                  @if (match.serieName) {
+                    <span class="text-slate-400 dark:text-white/30">•</span>
+                    <span class="text-xs sm:text-sm font-medium text-slate-700 dark:text-white/80">
+                      {{ match.serieName }}
+                    </span>
                   }
-                  <span class="text-white font-medium text-xs sm:text-sm break-words min-w-0">{{ team0.name ?? 'TBD' }}</span>
-                } @else {
-                  <span class="text-white/50 font-medium text-xs sm:text-sm">TBD</span>
-                }
+                </div>
+                <span class="text-[11px] font-bold text-slate-500 dark:text-white/40 tracking-wider shrink-0">FINISHED</span>
               </div>
 
-              <!-- Score in the middle -->
-              <div class="px-2 sm:px-4 text-center shrink-0 flex items-center justify-center gap-2 font-rajdhani text-2xl font-bold">
-                <span [class.text-primary]="(match.teams[0]?.score ?? 0) > (match.teams[1]?.score ?? 0)" class="text-white">{{ match.teams[0]?.score ?? 0 }}</span>
-                <span class="text-white/30 text-lg">-</span>
-                <span [class.text-primary]="(match.teams[1]?.score ?? 0) > (match.teams[0]?.score ?? 0)" class="text-white">{{ match.teams[1]?.score ?? 0 }}</span>
-              </div>
-
-              <div class="flex items-center gap-1.5 sm:gap-3 justify-end min-w-0">
-                @if (match.teams?.[1]; as team1) {
-                  <span class="text-white font-medium text-xs sm:text-sm break-words text-right min-w-0">{{ team1.name ?? 'TBD' }}</span>
-                  @if (team1.imageUrl) {
-                    <img [src]="team1.imageUrl" [alt]="team1.name ?? 'Team'"
-                         class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+              <!-- Teams -->
+              <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
+                <div class="flex items-center gap-1.5 sm:gap-3 min-w-0">
+                  @if (match.teams?.[0]; as team0) {
+                    @if (team0.imageUrl) {
+                      <img [src]="team0.imageUrl" [alt]="team0.name ?? 'Team'"
+                           class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                    }
+                    <span class="text-slate-900 dark:text-white font-medium text-xs sm:text-sm break-words min-w-0">{{ team0.name ?? 'TBD' }}</span>
+                  } @else {
+                    <span class="text-slate-500 dark:text-white/50 font-medium text-xs sm:text-sm">TBD</span>
                   }
-                } @else {
-                  <span class="text-white/50 font-medium text-xs sm:text-sm">TBD</span>
-                }
-              </div>
-            </div>
+                </div>
 
-            <!-- Footer: format -->
-            <div class="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-white/[0.06] gap-2">
-              <span class="text-[11px]" style="color: rgba(255,255,255,0.30);">
-                Best of {{ match.numberOfGames ?? '—' }}
-              </span>
+                <!-- Score in the middle -->
+                <div class="px-2 sm:px-4 text-center shrink-0 flex items-center justify-center gap-2 font-rajdhani text-2xl font-bold">
+                  <span [class.text-primary]="(match.teams[0]?.score ?? 0) > (match.teams[1]?.score ?? 0)" class="text-slate-900 dark:text-white">{{ match.teams[0]?.score ?? 0 }}</span>
+                  <span class="text-slate-400 dark:text-white/30 text-lg">-</span>
+                  <span [class.text-primary]="(match.teams[1]?.score ?? 0) > (match.teams[0]?.score ?? 0)" class="text-slate-900 dark:text-white">{{ match.teams[1]?.score ?? 0 }}</span>
+                </div>
+
+                <div class="flex items-center gap-1.5 sm:gap-3 justify-end min-w-0">
+                  @if (match.teams?.[1]; as team1) {
+                    <span class="text-slate-900 dark:text-white font-medium text-xs sm:text-sm break-words text-right min-w-0">{{ team1.name ?? 'TBD' }}</span>
+                    @if (team1.imageUrl) {
+                      <img [src]="team1.imageUrl" [alt]="team1.name ?? 'Team'"
+                           class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                    }
+                  } @else {
+                    <span class="text-slate-500 dark:text-white/50 font-medium text-xs sm:text-sm">TBD</span>
+                  }
+                </div>
+              </div>
+
+              <!-- Footer: format -->
+              <div class="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-slate-100 dark:border-white/[0.06] gap-2">
+                <span class="text-[11px] text-slate-500 dark:text-white/30">
+                  Best of {{ match.numberOfGames ?? '—' }}
+                </span>
+              </div>
             </div>
           </div>
         }

@@ -75,4 +75,11 @@ export class TournamentService {
       { withCredentials: true }
     );
   }
+
+  getTournamentById(tournamentId: number): Observable<Tournament> {
+    return this.http.get<Tournament>(
+      `${environment.apiUrl}/tournaments/${tournamentId}`,
+      { withCredentials: true }
+    );
+  }
 }

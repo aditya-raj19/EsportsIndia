@@ -4,25 +4,22 @@ import { Login } from './login/login';
 import { Signup} from './signup/signup';
 import { Privacy } from './privacy/privacy';
 import { Terms } from './terms/terms';
+import { TournamentDetails } from './tournament-details/tournament-details';
+import { MatchDetails } from './match-details/match-details';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'homepage', pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
-  { path: 'homepage', component: Home },
-  { path: 'live', component: Home },
-  { path: 'live/:game', component: Home },
-  { path: 'upcoming', component: Home },
-  { path: 'upcoming/:game', component: Home },
-  { path: 'results', component: Home },
-  { path: 'results/:game', component: Home },
-  { path: 'tournaments', component: Home },
-  { path: 'tournaments/:game', component: Home },
-  { path: 'teams', component: Home },
-  { path: 'teams/:game', component: Home },
-  { path: 'rankings', component: Home },
-  { path: 'news', component: Home },
-  { path: 'news/:game', component: Home },
+  { path: 'tournament/:id', component: TournamentDetails },
+  { path: 'match/:id', component: MatchDetails },
   { path: 'privacy', component: Privacy },
   { path: 'terms', component: Terms },
+  
+  // Catch-all parameterized routes for Home component sections 
+  // (homepage, live, upcoming, results, tournaments, teams, rankings, news)
+  // This enables RouteReuse, preventing component destruction/flicker on navigation
+  { path: ':section', component: Home },
+  { path: ':section/:game', component: Home },
 ];
+

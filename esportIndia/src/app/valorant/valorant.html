@@ -1,12 +1,4 @@
-<div class="min-h-screen bg-[#0a0a0f] font-sans relative overflow-hidden px-6 py-12">
-
-  <!-- Background grid -->
-    <div class="absolute inset-0 pointer-events-none bg-grid"></div>
-
-
-  <!-- Glow blobs -->
-    <div class="absolute w-[500px] h-[500px] rounded-full pointer-events-none -top-32 -left-24 glow-purple"></div>
-  <div class="absolute w-[350px] h-[350px] rounded-full pointer-events-none -bottom-20 right-16 glow-gold"></div>
+<div class="min-h-screen bg-slate-50 dark:bg-eb-bg font-sans relative overflow-hidden px-6 py-12 transition-colors duration-300">
 
 
   <div class="relative z-10 max-w-5xl mx-auto">
@@ -18,7 +10,7 @@
           <span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
           <span class="text-primary text-xs font-medium uppercase tracking-wider">{{ gameName() }}</span>
         </div>
-        <h1 class="font-rajdhani text-4xl font-bold text-white flex items-center gap-3">
+        <h1 class="font-rajdhani text-4xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
           Upcoming Matches
           @if (!loading() && filteredMatches().length > 0) {
             <span class="text-xs font-bold px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/30 tracking-wider">
@@ -56,7 +48,7 @@
 
     <!-- Empty state -->
     @if (!loading() && !errorMsg() && filteredMatches().length === 0) {
-      <div class="text-center py-20" style="color: rgba(255,255,255,0.35);">
+      <div class="text-center py-20 text-slate-500 dark:text-white/35">
         No upcoming matches found.
       </div>
     }
@@ -65,105 +57,93 @@
     @if (!loading() && filteredMatches().length > 0) {
       <div class="grid gap-4">
         @for (match of filteredMatches(); track match.matchId) {
-          <div class="match-card bg-white/[0.03] border border-purple-700/25 rounded-2xl p-6 hover:border-purple-500/40 transition-all duration-300" [style.animation-delay.ms]="$index * 80">
-
-            <!-- League / tournament context -->
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <div class="flex flex-wrap items-center gap-2 min-w-0">
-                <span class="text-primary text-[11px] uppercase tracking-widest font-bold">
-                  {{ match.leagueName ?? 'Unknown League' }}
-                </span>
-                @if (match.serieName) {
-                  <span class="text-white/30">•</span>
-                  <span class="text-xs sm:text-sm font-medium text-white/80">
-                    {{ match.serieName }}
+          <!-- Match Card with Animated Glow -->
+          <div (click)="navigateToMatch(match)" class="relative match-card rounded-2xl p-[1px] bg-slate-200 dark:bg-eb-border overflow-hidden cursor-pointer shadow-sm hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(0,217,192,0.15)] hover:-translate-y-0.5 transition-all duration-300 group" [style.animation-delay.ms]="$index * 80">
+            <!-- Animated Glow Background (Flows strictly along border on hover) -->
+            <div class="absolute inset-0 z-0 animate-glowing-border-hover opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <!-- Inner Content (Matches standard site dark surface) -->
+            <div class="relative z-10 bg-white dark:bg-eb-surface2 group-hover:bg-slate-50 dark:group-hover:bg-[#22283a] rounded-[15px] p-6 h-full flex flex-col transition-colors">
+              <!-- League / tournament context -->
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <div class="flex flex-wrap items-center gap-2 min-w-0">
+                  <span class="text-primary text-[11px] uppercase tracking-widest font-bold">
+                    {{ match.leagueName ?? 'Unknown League' }}
+                  </span>
+                  @if (match.serieName) {
+                    <span class="text-slate-400 dark:text-white/30">•</span>
+                    <span class="text-xs sm:text-sm font-medium text-slate-700 dark:text-white/80">
+                      {{ match.serieName }}
+                    </span>
+                  }
+                </div>
+                @if (match.beginAt) {
+                  <span class="text-[11px] font-medium shrink-0 text-slate-500 dark:text-white/40">
+                    {{ match.beginAt | date:'MMM d, h:mm a' }}
                   </span>
                 }
               </div>
-              @if (match.beginAt) {
-                <span class="text-[11px] font-medium shrink-0" style="color: rgba(255,255,255,0.40);">
-                  {{ match.beginAt | date:'MMM d, h:mm a' }}
+
+              <!-- Teams -->
+              <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
+                <div class="flex items-center gap-1.5 sm:gap-3 min-w-0">
+                  @if (match.teams?.[0]; as team0) {
+                    @if (team0.imageUrl) {
+                      <img [src]="team0.imageUrl" [alt]="team0.name ?? 'Team'"
+                           class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                    }
+                    <span class="text-slate-900 dark:text-white font-medium text-xs sm:text-sm break-words min-w-0">{{ team0.name ?? 'TBD' }}</span>
+                  } @else {
+                    <span class="text-slate-500 dark:text-white/50 font-medium text-xs sm:text-sm">TBD</span>
+                  }
+                </div>
+
+                <div class="px-2 sm:px-4 text-center shrink-0">
+                  @if (match.beginAt) {
+                    <app-match-countdown class="countdown-large" [targetTime]="match.beginAt" />
+                  }
+                  <span class="mt-1 sm:mt-2 block font-rajdhani text-xs sm:text-sm font-extrabold tracking-widest text-slate-400 dark:text-white/30">VS</span>
+                </div>
+
+                <div class="flex items-center gap-1.5 sm:gap-3 justify-end min-w-0">
+                  @if (match.teams?.[1]; as team1) {
+                    <span class="text-slate-900 dark:text-white font-medium text-xs sm:text-sm break-words text-right min-w-0">{{ team1.name ?? 'TBD' }}</span>
+                    @if (team1.imageUrl) {
+                      <img [src]="team1.imageUrl" [alt]="team1.name ?? 'Team'"
+                           class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                    }
+                  } @else {
+                    <span class="text-slate-500 dark:text-white/50 font-medium text-xs sm:text-sm">TBD</span>
+                  }
+                </div>
+              </div>
+
+              <!-- Footer: format + stream link -->
+              <div class="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-slate-100 dark:border-white/[0.06] gap-2">
+                <span class="text-[11px] text-slate-500 dark:text-white/30">
+                  Best of {{ match.numberOfGames ?? '—' }}
                 </span>
-              }
-            </div>
-
-            <!-- Teams -->
-            <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
-              <div class="flex items-center gap-1.5 sm:gap-3 min-w-0">
-                @if (match.teams?.[0]; as team0) {
-                  @if (team0.imageUrl) {
-                    <img [src]="team0.imageUrl" [alt]="team0.name ?? 'Team'"
-                         class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
-                  }
-                  <span class="text-white font-medium text-xs sm:text-sm break-words min-w-0">{{ team0.name ?? 'TBD' }}</span>
-                } @else {
-                  <span class="text-white/50 font-medium text-xs sm:text-sm">TBD</span>
-                }
-              </div>
-
-              <div class="px-2 sm:px-4 text-center shrink-0">
-                @if (match.beginAt) {
-                  <app-match-countdown class="countdown-large" [targetTime]="match.beginAt" />
-                }
-                <span class="mt-1 sm:mt-2 block font-rajdhani text-xs sm:text-sm font-extrabold tracking-widest" style="color: rgba(255,255,255,0.30);">VS</span>
-              </div>
-
-              <div class="flex items-center gap-1.5 sm:gap-3 justify-end min-w-0">
-                @if (match.teams?.[1]; as team1) {
-                  <span class="text-white font-medium text-xs sm:text-sm break-words text-right min-w-0">{{ team1.name ?? 'TBD' }}</span>
-                  @if (team1.imageUrl) {
-                    <img [src]="team1.imageUrl" [alt]="team1.name ?? 'Team'"
-                         class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
-                  }
-                } @else {
-                  <span class="text-white/50 font-medium text-xs sm:text-sm">TBD</span>
-                }
-              </div>
-            </div>
-
-            <!-- Footer: format + stream link -->
-            <div class="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-white/[0.06] gap-2">
-              <span class="text-[11px]" style="color: rgba(255,255,255,0.30);">
-                Best of {{ match.numberOfGames ?? '—' }}
-              </span>
-              
-              <div class="flex flex-wrap items-center gap-2">
-                @if (match.streams && match.streams.length > 0) {
-                  @for (stream of match.streams; track stream.rawUrl) {
-                    <a [href]="stream.rawUrl" target="_blank" rel="noopener noreferrer"
-                       [class]="getStreamPlatform(stream.rawUrl) === 'YouTube' 
-                         ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
-                         : getStreamPlatform(stream.rawUrl) === 'Twitch' 
-                         ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
-                         : 'text-xs font-medium px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1.5'">
-                      @if (getStreamPlatform(stream.rawUrl) === 'Twitch') {
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M2.149 0L.537 4.119v16.836h5.731V24h3.224l3.045-3.045h4.657l6.269-6.269V0H2.149zm19.164 13.612l-4.298 4.298h-4.657l-3.045 3.045v-3.045H4.836V2.149h16.478v11.463zm-3.582-7.343v5.731h-2.149V6.269h2.149zm-5.731 0v5.731H9.851V6.269h2.149z"/>
-                        </svg>
-                      } @else if (getStreamPlatform(stream.rawUrl) === 'YouTube') {
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.501 5.814a3.016 3.016 0 0 0 2.122 2.136c1.872.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                        </svg>
-                      } @else {
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M8 5v14l11-7z"/>
-                        </svg>
-                      }
-                      Watch {{ getStreamPlatform(stream.rawUrl) }}
+                
+                <div class="flex flex-wrap items-center gap-2">
+                  @if (match.streams && match.streams.length > 0) {
+                    @for (stream of match.streams; track stream.rawUrl) {
+                      <a [href]="stream.rawUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()"
+                         [class]="getStreamPlatform(stream.rawUrl) === 'YouTube' 
+                           ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
+                           : getStreamPlatform(stream.rawUrl) === 'Twitch' 
+                           ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
+                           : 'text-xs font-medium px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1.5'">
+                        Watch {{ getStreamPlatform(stream.rawUrl) }}
+                      </a>
+                    }
+                  } @else if (match.streamUrl) {
+                    <a [href]="match.streamUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()"
+                       class="text-xs font-medium px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1.5">
+                      Watch Stream
                     </a>
                   }
-                } @else if (match.streamUrl) {
-                  <a [href]="match.streamUrl" target="_blank" rel="noopener noreferrer"
-                     class="text-xs font-medium px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1.5">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
-                    Watch Stream
-                  </a>
-                }
+                </div>
               </div>
             </div>
-
           </div>
         }
       </div>

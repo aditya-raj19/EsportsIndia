@@ -1,0 +1,67 @@
+<div class="bg-white border-b border-slate-200 dark:bg-eb-bg dark:border-eb-border py-2 relative transition-colors duration-300">
+  
+  <!-- Left Scroll Button -->
+  <button (click)="scrollTicker('left')" class="absolute left-0 top-0 bottom-0 z-10 w-8 bg-gradient-to-r from-white to-transparent dark:from-eb-bg dark:to-transparent flex items-center justify-center text-slate-400 hover:text-slate-900 dark:text-eb-muted dark:hover:text-eb-ink focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-eb-amber transition">
+    &lsaquo;
+  </button>
+
+  <div id="ticker-container" class="max-w-7xl mx-auto px-8 flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth relative">
+    
+    <!-- Fallback if empty -->
+    @if (matches.length === 0) {
+      <div class="flex-shrink-0 w-72 h-16 bg-slate-50 border border-slate-200 dark:bg-eb-surface dark:border-eb-border rounded-lg flex items-center justify-center motion-reduce:animate-none">
+        <span class="text-xs text-slate-500 dark:text-eb-muted">Loading live matches...</span>
+      </div>
+    }
+
+    <!-- Ticker Cards -->
+    @for (match of matches; track match.matchId) {
+      <div (click)="navigateToMatch(match)" class="flex-shrink-0 w-80 bg-slate-50 border border-slate-200 hover:bg-slate-100 shadow-sm dark:shadow-none dark:bg-eb-surface dark:border-eb-border rounded-lg p-3 cursor-pointer dark:hover:bg-eb-surface2 transition relative overflow-hidden group">
+        
+        <!-- Live Dot & League -->
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]"></span>
+            <span class="text-xs text-red-600 font-bold tracking-wider uppercase">Live</span>
+          </div>
+          <span class="text-xs text-slate-500 dark:text-eb-muted font-semibold truncate max-w-[140px]">{{ match.leagueName }}</span>
+        </div>
+
+        <!-- Teams & Scores -->
+        <div class="space-y-2">
+          <!-- Team 1 -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              @if (match.teams[0]?.imageUrl) {
+                <img [src]="match.teams[0]?.imageUrl" class="w-5 h-5 object-contain">
+              } @else {
+                <div class="w-5 h-5 bg-slate-200 dark:bg-eb-surface2 rounded flex items-center justify-center text-[9px] font-bold text-slate-500 dark:text-eb-muted">T1</div>
+              }
+              <span class="text-sm font-semibold text-slate-900 dark:text-eb-ink truncate max-w-[100px]">{{ match.teams[0]?.acronym || match.teams[0]?.name || 'TBD' }}</span>
+            </div>
+            <span class="text-base font-bold text-slate-900 dark:text-eb-ink font-mono">{{ match.teams[0]?.score || 0 }}</span>
+          </div>
+          
+          <!-- Team 2 -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              @if (match.teams[1]?.imageUrl) {
+                <img [src]="match.teams[1]?.imageUrl" class="w-5 h-5 object-contain">
+              } @else {
+                <div class="w-5 h-5 bg-slate-200 dark:bg-eb-surface2 rounded flex items-center justify-center text-[9px] font-bold text-slate-500 dark:text-eb-muted">T2</div>
+              }
+              <span class="text-sm font-semibold text-slate-900 dark:text-eb-ink truncate max-w-[100px]">{{ match.teams[1]?.acronym || match.teams[1]?.name || 'TBD' }}</span>
+            </div>
+            <span class="text-base font-bold text-slate-900 dark:text-eb-ink font-mono">{{ match.teams[1]?.score || 0 }}</span>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+  
+  <!-- Right Scroll Button -->
+  <button (click)="scrollTicker('right')" class="absolute right-0 top-0 bottom-0 z-10 w-8 bg-gradient-to-l from-eb-bg to-transparent flex items-center justify-center text-eb-muted hover:text-eb-ink focus:outline-none focus:ring-2 focus:ring-eb-amber transition">
+    &rsaquo;
+  </button>
+</div>

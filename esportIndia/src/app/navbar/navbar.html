@@ -1,0 +1,66 @@
+<!-- Top Bar Navbar -->
+<nav class="sticky top-0 z-50 bg-white/90 border-b border-slate-200 shadow-sm dark:bg-eb-surface2/90 dark:backdrop-blur-md dark:border-eb-cyan/20 dark:shadow-[0_4px_30px_rgba(0,217,192,0.05)] transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <!-- Top Navigation -->
+        <div class="h-14 sm:h-16 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 sm:gap-3 cursor-pointer flex-shrink-0" (click)="navigateTo('/homepage')">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 2L13 8H19L14 12L16 18L10 14L4 18L6 12L1 8H7L10 2Z" fill="#FFFFFF"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-rajdhani text-lg sm:text-xl md:text-2xl font-bold text-slate-900 dark:text-eb-ink tracking-wider">
+                        Esports<span class="text-blue-600">Buzz</span>
+                    </h1>
+                </div>
+            </div>
+            <!-- Menu -->
+            <div class="hidden md:flex items-center gap-2">
+                @for(menu of menus; track menu.route) {
+                <button (click)="navigateTo(menu.route)" 
+                    class="text-sm font-semibold transition-all duration-200 outline-none rounded-lg px-3.5 py-1.5 {{ isActive(menu.route) ? 'bg-blue-50 text-blue-600 dark:bg-eb-surface dark:text-eb-amber border border-blue-200 dark:border-eb-amber/40 shadow-sm' : 'text-slate-600 dark:text-eb-muted hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5' }}">
+                    {{ menu.label }}
+                </button>
+                }
+            </div>
+            <!-- Right Side -->
+            <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+                <!-- Theme Toggle -->
+                <button (click)="toggleTheme()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-base bg-slate-100 hover:bg-slate-200 border-slate-200 dark:bg-eb-surface dark:hover:bg-eb-surface2 transition focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-eb-amber border dark:border-eb-border text-slate-600 dark:text-eb-ink">
+                    @if (isDarkMode()) {
+                        🌙
+                    } @else {
+                        ☀️
+                    }
+                </button>
+                <!-- Notifications -->
+                <button class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-base bg-slate-100 hover:bg-slate-200 border-slate-200 dark:bg-eb-surface dark:hover:bg-eb-surface2 transition focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-eb-amber border dark:border-eb-border">
+                    🔔
+                </button>
+                @if(auth.isLoggedIn()) {
+                <button (click)="onSignOut()" class="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl bg-eb-surface border border-eb-crimson/50
+               text-eb-crimson hover:bg-eb-crimson/20 transition focus:outline-none focus:ring-2 focus:ring-eb-amber">
+                    Logout
+                </button>
+                } @else {
+                <button (click)="navigateTo('/login')" class="px-3 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white font-medium focus:outline-none focus:ring-2 focus:ring-eb-ink">
+                    Login
+                </button>
+                }
+            </div>
+        </div>
+        <!-- Mobile navigation -->
+        <div class="md:hidden -mx-4 sm:-mx-6 border-t border-slate-200 dark:border-eb-border px-4 sm:px-6">
+            <div class="flex gap-1.5 overflow-x-auto py-2 scrollbar-hide">
+                @for(menu of menus; track menu.route) {
+                <button (click)="navigateTo(menu.route)"
+                    class="shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 outline-none {{ isActive(menu.route) ? 'bg-blue-50 text-blue-600 dark:bg-eb-surface dark:text-eb-amber border border-blue-200 dark:border-eb-amber/40 shadow-sm' : 'text-slate-500 dark:text-eb-muted hover:bg-slate-50 dark:hover:bg-white/5' }}">
+                    {{ menu.label }}
+                </button>
+                }
+            </div>
+        </div>
+    </div>
+</nav>

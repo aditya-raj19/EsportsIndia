@@ -1,5 +1,6 @@
 import { Component, input, inject, signal, OnInit, OnDestroy, OnChanges, SimpleChanges, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -17,6 +18,7 @@ export class LiveMatches implements OnInit, OnChanges, OnDestroy {
 
   private readonly matchService = inject(MatchService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
   readonly matches = signal<UpcomingMatch[]>([]);
   readonly loading = signal(false);
   readonly errorMsg = signal<string | null>(null);
@@ -92,6 +94,13 @@ export class LiveMatches implements OnInit, OnChanges, OnDestroy {
     const lowerUrl = url.toLowerCase();
     if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) return 'YouTube';
     if (lowerUrl.includes('twitch.tv')) return 'Twitch';
+    if (lowerUrl.includes('kick.com')) return 'Kick';
     return 'Stream';
+  }
+
+  navigateToMatch(match: UpcomingMatch): void {
+    this.router.navigate(['/match', match.matchId], {
+      state: { match }
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnChanges, SimpleChanges, inject, signal, computed, input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { GameSlug, MatchService, UpcomingMatch } from '../services/matchservice';
 import { MatchCountdown } from '../match-countdown/match-countdown';
 import { Dropdown } from '../dropdown/dropdown';
@@ -16,6 +17,7 @@ export class Valorant implements OnInit, OnChanges {
   readonly gameName = input<string>('Valorant');
 
   private matchService = inject(MatchService);
+  private router = inject(Router);
 
   matches = signal<UpcomingMatch[]>([]);
   loading = signal(true);
@@ -77,6 +79,13 @@ export class Valorant implements OnInit, OnChanges {
     const lowerUrl = url.toLowerCase();
     if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) return 'YouTube';
     if (lowerUrl.includes('twitch.tv')) return 'Twitch';
+    if (lowerUrl.includes('kick.com')) return 'Kick';
     return 'Stream';
+  }
+
+  navigateToMatch(match: UpcomingMatch): void {
+    this.router.navigate(['/match', match.matchId], {
+      state: { match }
+    });
   }
 }

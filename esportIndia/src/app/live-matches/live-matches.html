@@ -1,10 +1,4 @@
-<div class="min-h-screen bg-[#0a0a0f] font-sans relative overflow-hidden px-6 py-12">
-  <!-- Background grid -->
-  <div class="absolute inset-0 pointer-events-none bg-grid"></div>
-
-  <!-- Glow blobs -->
-  <div class="absolute w-[500px] h-[500px] rounded-full pointer-events-none -top-32 -left-24 glow-purple"></div>
-  <div class="absolute w-[350px] h-[350px] rounded-full pointer-events-none -bottom-20 right-16 glow-gold"></div>
+<div class="min-h-screen bg-slate-50 dark:bg-eb-bg font-sans relative overflow-hidden px-6 py-12 transition-colors duration-300">
 
   <div class="relative z-10 max-w-5xl mx-auto">
     <!-- Header -->
@@ -13,7 +7,7 @@
         <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
         <span class="text-red-400 text-xs font-medium uppercase tracking-wider">Live now</span>
       </div>
-      <h1 class="font-rajdhani text-4xl font-bold text-white flex items-center gap-3">
+      <h1 class="font-rajdhani text-4xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
         Live {{ gameName() }} Matches
         @if (!loading() && matches().length > 0) {
           <span class="text-xs font-bold px-3 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/30 tracking-wider">
@@ -39,7 +33,7 @@
 
     <!-- Empty state -->
     @if (!loading() && !errorMsg() && matches().length === 0) {
-      <div class="text-center py-20" style="color: rgba(255,255,255,0.35);">
+      <div class="text-center py-20 text-slate-500 dark:text-white/35">
         No live {{ gameName() }} matches right now.
       </div>
     }
@@ -48,93 +42,74 @@
     @if (!loading() && matches().length > 0) {
       <div class="grid gap-4">
         @for (match of matches(); track match.matchId) {
-          <div class="match-card bg-white/[0.03] border border-purple-700/25 rounded-2xl p-6 hover:border-purple-500/40 transition-all duration-300" [style.animation-delay.ms]="$index * 80">
-            <!-- League / tournament context -->
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <div class="flex flex-wrap items-center gap-2 min-w-0">
-                <span class="text-primary text-[11px] uppercase tracking-widest font-bold">
-                  {{ match.leagueName ?? 'Unknown League' }}
-                </span>
-                @if (match.serieName) {
-                  <span class="text-white/30">•</span>
-                  <span class="text-xs sm:text-sm font-medium text-white/80">
-                    {{ match.serieName }}
+          <!-- Match Card with Continuous Glowing Border Animation for Live Matches -->
+          <div (click)="navigateToMatch(match)" class="relative match-card rounded-2xl p-[1px] bg-slate-200 dark:bg-eb-border overflow-hidden cursor-pointer shadow-sm hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(239,68,68,0.25)] hover:-translate-y-0.5 transition-all duration-300 group" [style.animation-delay.ms]="$index * 80">
+            <!-- Animated Glow Background (Flows strictly along border) -->
+            <div class="absolute inset-0 z-0 animate-glowing-border opacity-90"></div>
+            <!-- Inner Content (Solid background blocks center glow) -->
+            <div class="relative z-10 bg-white dark:bg-eb-surface2 group-hover:bg-slate-50 dark:group-hover:bg-[#22283a] rounded-[15px] p-5 sm:p-6 h-full flex flex-col justify-between transition-colors">
+              <!-- League / tournament context -->
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <div class="flex flex-wrap items-center gap-2 min-w-0">
+                  <span class="text-primary text-[11px] uppercase tracking-widest font-bold">
+                    {{ match.leagueName ?? 'Unknown League' }}
                   </span>
-                }
-              </div>
-              <span class="text-[11px] font-bold text-red-400 animate-pulse tracking-wider flex items-center gap-1.5 shrink-0">
-                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> LIVE NOW
-              </span>
-            </div>
-
-            <!-- Teams -->
-            <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
-              <div class="flex items-center gap-1.5 sm:gap-3 min-w-0">
-                @if (match.teams?.[0]; as team0) {
-                  @if (team0.imageUrl) {
-                    <img [src]="team0.imageUrl" [alt]="team0.name ?? 'Team'"
-                         class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                  @if (match.serieName) {
+                    <span class="text-slate-400 dark:text-white/30">•</span>
+                    <span class="text-xs sm:text-sm font-medium text-slate-700 dark:text-white/80 truncate">
+                      {{ match.serieName }}
+                    </span>
                   }
-                  <span class="text-white font-medium text-xs sm:text-sm break-words min-w-0">{{ team0.name ?? 'TBD' }}</span>
-                } @else {
-                  <span class="text-white/50 font-medium text-xs sm:text-sm">TBD</span>
-                }
+                </div>
+                <span class="text-[11px] font-bold text-red-500 animate-pulse tracking-wider flex items-center gap-1.5 shrink-0 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> LIVE NOW
+                </span>
               </div>
 
-              <!-- Score in the middle -->
-              <div class="px-2 sm:px-4 text-center shrink-0 flex items-center justify-center gap-2 font-rajdhani text-2xl font-bold">
-                <span [class.text-primary]="(match.teams[0]?.score ?? 0) > (match.teams[1]?.score ?? 0)" class="text-white">{{ match.teams[0]?.score ?? 0 }}</span>
-                <span class="text-white/30 text-lg">-</span>
-                <span [class.text-primary]="(match.teams[1]?.score ?? 0) > (match.teams[0]?.score ?? 0)" class="text-white">{{ match.teams[1]?.score ?? 0 }}</span>
-              </div>
-
-              <div class="flex items-center gap-1.5 sm:gap-3 justify-end min-w-0">
-                @if (match.teams?.[1]; as team1) {
-                  <span class="text-white font-medium text-xs sm:text-sm break-words text-right min-w-0">{{ team1.name ?? 'TBD' }}</span>
-                  @if (team1.imageUrl) {
-                    <img [src]="team1.imageUrl" [alt]="team1.name ?? 'Team'"
-                         class="w-6 h-6 sm:w-10 sm:h-10 object-contain shrink-0 bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+              <!-- Teams & Scorecard in the Middle -->
+              <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4 my-2">
+                <!-- Team 1 (Left) -->
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                  @if (match.teams?.[0]?.imageUrl && match.teams[0].imageUrl !== 'null') {
+                    <img [src]="match.teams[0].imageUrl" [alt]="match.teams[0].name" class="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
                   }
-                } @else {
-                  <span class="text-white/50 font-medium text-xs sm:text-sm">TBD</span>
-                }
-              </div>
-            </div>
+                  <span class="text-slate-900 dark:text-white font-bold text-xs sm:text-base truncate">{{ match.teams?.[0]?.name ?? 'TBD' }}</span>
+                </div>
 
-            <!-- Footer: format + streams -->
-            <div class="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-white/[0.06] gap-2">
-              <span class="text-[11px]" style="color: rgba(255,255,255,0.30);">
-                Best of {{ match.numberOfGames ?? '—' }}
-              </span>
-              
-              <div class="flex flex-wrap items-center gap-2">
+                <!-- Scorecard Box in the Middle -->
+                <div class="px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-100 dark:bg-eb-bg rounded-xl border border-slate-200 dark:border-eb-border shrink-0 flex items-center justify-center gap-2 font-mono text-xl sm:text-2xl font-black text-slate-900 dark:text-eb-amber shadow-inner">
+                  <span>{{ match.teams[0]?.score ?? 0 }}</span>
+                  <span class="text-slate-400 dark:text-eb-muted font-bold">:</span>
+                  <span>{{ match.teams[1]?.score ?? 0 }}</span>
+                </div>
+
+                <!-- Team 2 (Right) -->
+                <div class="flex items-center gap-2 sm:gap-3 justify-end min-w-0">
+                  <span class="text-slate-900 dark:text-white font-bold text-xs sm:text-base truncate text-right">{{ match.teams?.[1]?.name ?? 'TBD' }}</span>
+                  @if (match.teams?.[1]?.imageUrl && match.teams[1].imageUrl !== 'null') {
+                    <img [src]="match.teams[1].imageUrl" [alt]="match.teams[1].name" class="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                  }
+                </div>
+              </div>
+
+              <!-- Footer: format + stream button -->
+              <div class="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-white/[0.06] gap-2">
+                <span class="text-[11px] text-slate-500 dark:text-white/40 font-medium">
+                  Best of {{ match.numberOfGames ?? '—' }}
+                </span>
+                
                 @if (match.streams && match.streams.length > 0) {
-                  @for (stream of match.streams; track stream.rawUrl) {
-                    <a [href]="stream.rawUrl" target="_blank" rel="noopener noreferrer"
-                       [class]="getStreamPlatform(stream.rawUrl) === 'YouTube' 
-                         ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
-                         : getStreamPlatform(stream.rawUrl) === 'Twitch' 
-                         ? 'text-xs font-medium px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-pointer flex items-center gap-1.5' 
-                         : 'text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5'">
-                      @if (getStreamPlatform(stream.rawUrl) === 'Twitch') {
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M2.149 0L.537 4.119v16.836h5.731V24h3.224l3.045-3.045h4.657l6.269-6.269V0H2.149zm19.164 13.612l-4.298 4.298h-4.657l-3.045 3.045v-3.045H4.836V2.149h16.478v11.463zm-3.582-7.343v5.731h-2.149V6.269h2.149zm-5.731 0v5.731H9.851V6.269h2.149z"/>
-                        </svg>
-                      } @else if (getStreamPlatform(stream.rawUrl) === 'YouTube') {
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.501 5.814a3.016 3.016 0 0 0 2.122 2.136c1.872.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                        </svg>
-                      } @else {
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                      }
-                      Watch {{ getStreamPlatform(stream.rawUrl) }}
-                    </a>
-                  }
-                } @else if (match.streamUrl) {
-                  <a [href]="match.streamUrl" target="_blank" rel="noopener noreferrer"
-                     class="text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                    Watch Stream
+                  @let s = match.streams[0];
+                  @let platform = getStreamPlatform(s.rawUrl);
+                  <a [href]="s.rawUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()"
+                     [class]="platform === 'Kick'
+                       ? 'text-xs font-black px-3.5 py-1.5 rounded-lg bg-[#53FC18] text-black hover:bg-[#43d410] transition-colors shadow-sm flex items-center gap-1.5 shrink-0'
+                       : platform === 'YouTube'
+                       ? 'text-xs font-bold px-3.5 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm flex items-center gap-1.5 shrink-0'
+                       : platform === 'Twitch'
+                       ? 'text-xs font-bold px-3.5 py-1.5 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors shadow-sm flex items-center gap-1.5 shrink-0'
+                       : 'text-xs font-bold px-3.5 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm flex items-center gap-1.5 shrink-0'">
+                    Watch {{ platform }}
                   </a>
                 }
               </div>

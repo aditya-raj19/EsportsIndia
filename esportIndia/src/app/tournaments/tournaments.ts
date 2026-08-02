@@ -1,6 +1,7 @@
 import { Component, input, inject, signal, computed, OnInit, OnChanges, SimpleChanges, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Tournament, TournamentService } from '../services/tournament.service';
 import { GameSlug } from '../services/matchservice';
 import { SearchComponent } from '../shared/search/search.component';
@@ -18,6 +19,7 @@ export class Tournaments implements OnInit, OnChanges {
 
   private readonly tournamentService = inject(TournamentService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
   
   readonly tournaments = signal<Tournament[]>([]);
   readonly loading = signal(false);
@@ -95,6 +97,18 @@ export class Tournaments implements OnInit, OnChanges {
     }
   }
 
+  getTierGlowColor(tier: string): string {
+    const t = tier?.toLowerCase() || '';
+    switch (t) {
+      case 's': return 'bg-[conic-gradient(from_90deg,transparent_0%,transparent_70%,#a855f7_100%)]';
+      case 'a': return 'bg-[conic-gradient(from_90deg,transparent_0%,transparent_70%,#f97316_100%)]';
+      case 'b': return 'bg-[conic-gradient(from_90deg,transparent_0%,transparent_70%,#3b82f6_100%)]';
+      case 'c': return 'bg-[conic-gradient(from_90deg,transparent_0%,transparent_70%,#22c55e_100%)]';
+      case 'd': return 'bg-[conic-gradient(from_90deg,transparent_0%,transparent_70%,#64748b_100%)]';
+      default: return 'bg-[conic-gradient(from_90deg,transparent_0%,transparent_70%,#00D9C0_100%)]';
+    }
+  }
+
   formatDate(dateStr: string): string {
     if (!dateStr) return 'TBA';
     return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -133,5 +147,11 @@ export class Tournaments implements OnInit, OnChanges {
       currency: 'INR',
       maximumFractionDigits: 0
     }).format(inrAmount);
+  }
+
+  navigateToTournament(tournament: Tournament) {
+    this.router.navigate(['/tournament', tournament.id], {
+      state: { tournament }
+    });
   }
 }

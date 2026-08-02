@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable, shareReplay, map } from 'rxjs';
 import { environment } from '../../environment/environment';
 
 
@@ -37,7 +37,7 @@ export interface ValorantMatch {
 
 export interface UpcomingMatch extends ValorantMatch {}
 
-export type GameSlug = 'all' | 'valorant' | 'cs2' | 'lol' | 'dota2' | 'pubg';
+export type GameSlug = 'all' | 'valorant' | 'cs2' | 'lol' | 'dota2' | 'pubg' | 'bgmi' | 'freefire';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
@@ -60,6 +60,27 @@ export class MatchService {
     return this.getUpcomingMatches('valorant');
   }
 
+  private ensureKickStream(matches: UpcomingMatch[]): UpcomingMatch[] {
+    if (!matches) return [];
+    return matches.map(m => {
+      const streams = m.streams ? [...m.streams] : [];
+      const hasKick = streams.some(s => s.rawUrl && s.rawUrl.includes('kick.com'));
+      if (!hasKick) {
+        streams.push({
+          rawUrl: 'https://kick.com/efecdb',
+          language: 'en',
+          isMain: false,
+          isOfficial: true
+        });
+      }
+      return {
+        ...m,
+        streamUrl: m.streamUrl || 'https://kick.com/efecdb',
+        streams: streams
+      };
+    });
+  }
+
   private liveMatchesCache = new Map<GameSlug, Observable<UpcomingMatch[]>>();
   getLiveMatches(game: GameSlug) {
     if (game === 'all') {
@@ -69,7 +90,10 @@ export class MatchService {
       const req$ = this.http.get<UpcomingMatch[]>(
         `${environment.apiUrl}/matches/${game}/live`,
         { withCredentials: true }
-      ).pipe(shareReplay(1));
+      ).pipe(
+        map(matches => this.ensureKickStream(matches)),
+        shareReplay(1)
+      );
       
       this.liveMatchesCache.set(game, req$);
       setTimeout(() => this.liveMatchesCache.delete(game), 15000);
@@ -97,7 +121,10 @@ export class MatchService {
       this.allLiveCache$ = this.http.get<UpcomingMatch[]>(
         `${environment.apiUrl}/matches/valorant/all/live`,
         { withCredentials: true }
-      ).pipe(shareReplay(1));
+      ).pipe(
+        map(matches => this.ensureKickStream(matches)),
+        shareReplay(1)
+      );
       
       setTimeout(() => this.allLiveCache$ = undefined, 15000);
     }
