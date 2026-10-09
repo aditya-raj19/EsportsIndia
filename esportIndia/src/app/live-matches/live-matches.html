@@ -71,7 +71,7 @@
                 <!-- Team 1 (Left) -->
                 <div class="flex items-center gap-2 sm:gap-3 min-w-0">
                   @if (match.teams?.[0]?.imageUrl && match.teams[0].imageUrl !== 'null') {
-                    <img [src]="match.teams[0].imageUrl" [alt]="match.teams[0].name" class="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                    <img [src]="match.teams[0].imageUrl" [alt]="match.teams[0].name" class="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/10 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
                   }
                   <span class="text-slate-900 dark:text-white font-bold text-xs sm:text-base truncate">{{ match.teams?.[0]?.name ?? 'TBD' }}</span>
                 </div>
@@ -87,7 +87,7 @@
                 <div class="flex items-center gap-2 sm:gap-3 justify-end min-w-0">
                   <span class="text-slate-900 dark:text-white font-bold text-xs sm:text-base truncate text-right">{{ match.teams?.[1]?.name ?? 'TBD' }}</span>
                   @if (match.teams?.[1]?.imageUrl && match.teams[1].imageUrl !== 'null') {
-                    <img [src]="match.teams[1].imageUrl" [alt]="match.teams[1].name" class="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/95 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
+                    <img [src]="match.teams[1].imageUrl" [alt]="match.teams[1].name" class="w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0 bg-slate-100 dark:bg-white/10 p-1 rounded-lg shadow-sm" onerror="this.style.display='none'" />
                   }
                 </div>
               </div>
